@@ -1,0 +1,99 @@
+@import "~normalize.css";
+@import "~@blueprintjs/core/lib/css/blueprint.css";
+@import "~@blueprintjs/icons/lib/css/blueprint-icons.css";
+
+body {
+	font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+html,
+body,
+.target {
+	margin: 0;
+}
+
+.target {
+	box-sizing: border-box;
+	padding: 10px;
+}
+
+.gui {
+	display: flex;
+	flex-direction: column;
+}
+
+.component-Keyboard {
+	background-color: #f1f1f1;
+	border-radius: 6px;
+	box-shadow: inset 0px 0px 0px 1px #8b8b8b, inset 0px 0px 0px 2px #f0f0f0,
+		0px 5px 0px 0px #aaaaaa, 0px 6px 0px 0px #7e7e7e,
+		0px 7px 8px 0px rgba(0, 0, 0, 0.75);
+
+	position: relative;
+	> .part-Key {
+		position: absolute;
+		padding: 3px 2px;
+	}
+}
+
+.component-Key {
+	height: 100%;
+	width: 100%;
+	outline: none;
+
+	border: 0px;
+	border-radius: 4px;
+	background: #e9e9e9 -webkit-linear-gradient(top, rgb(239, 239, 239) 0%, rgb(
+					224,
+					224,
+					224
+				)
+				100%);
+	background: #e9e9e9
+		linear-gradient(top, rgb(239, 239, 239) 0%, rgb(224, 224, 224) 100%);
+
+	box-shadow: inset 0px 0px 0px 1px #8b8b8b, inset 0px 0px 0px 2px #fbfbfb,
+		0px 2px 0px 0px #aaaaaa, 0px 3px 0px 0px #7e7e7e,
+		0px 3px 3px 0px rgba(0, 0, 0, 0.5);
+
+	&:active {
+		margin-top: 1px;
+		margin-bottom: 2px;
+		box-shadow: inset 0px 0px 0px 1px #8b8b8b, inset 0px 0px 0px 2px #fbfbfb,
+			0px 1px 0px 0px #aaaaaa, 0px 2px 0px 0px #7e7e7e,
+			0px 2px 3px 0px rgba(0, 0, 0, 0.5);
+	}
+
+	&.pressed {
+		background: blue;
+	}
+
+	&.active {
+		background: green;
+	}
+
+	display: flex;
+	flex-direction: column;
+
+	align-items: stretch;
+	margin: 0;
+	padding: 2px;
+
+	.part-KeyText {
+		margin: 2px 2px 0px 2px;
+
+		font-size: 12px;
+		color: blue;
+	}
+
+	.part-Action {
+		flex: 1;
+		font-size: 8px;
+
+		display: flex;
+		align-content: center;
+		justify-content: center;
+		align-items: center;
+		justify-items: center;
+	}
+}
