@@ -40,7 +40,8 @@ export class Modifiers {
 	constructor(
 		public readonly shift: boolean,
 		public readonly alt: boolean,
-		public readonly ctrl: boolean
+		public readonly ctrl: boolean,
+		public readonly meta: boolean
 	) {}
 
 	toString() {
@@ -54,18 +55,21 @@ export class Modifiers {
 		if (this.ctrl) {
 			items.push("Ctrl");
 		}
+		if (this.meta) {
+			items.push("Meta");
+		}
 		return items.join("+");
 	}
 }
 
 export interface KeyBindingsResult {
 	bindings: KeyBinding[];
-	followingKeyBindings: KeyBindings | undefined;
+	followingKeyBindings: KeyBindingTrie | undefined;
 }
 
-export class KeyBindings {
-	public static from(bindings: KeyBinding[]): KeyBindings {
-		const result = new KeyBindings();
+export class KeyBindingTrie {
+	public static from(bindings: KeyBinding[]): KeyBindingTrie {
+		const result = new KeyBindingTrie();
 		for (const b of bindings) {
 			result.addKeybinding(b);
 		}
@@ -99,7 +103,7 @@ export class KeyBindings {
 			r.bindings.push(binding);
 		} else {
 			if (!r.followingKeyBindings) {
-				r.followingKeyBindings = new KeyBindings();
+				r.followingKeyBindings = new KeyBindingTrie();
 			}
 			r.followingKeyBindings.addKeybinding(
 				binding,

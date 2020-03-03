@@ -1,4 +1,4 @@
-import { observable, action, runInAction, autorun } from "mobx";
+import { observable, action, runInAction, autorun, computed } from "mobx";
 import {
 	Keyboard,
 	KnownVirtualKeys,
@@ -7,14 +7,17 @@ import {
 	FunctionalLayoutsProvider,
 } from "./Keyboard";
 import {
-	KeyBindings,
+	KeyBindingTrie,
 	Modifiers,
 	KeyWithModifiers,
 	KeyBindingsResult,
 } from "./keybindings";
-import { getVsCodeBindings } from "./keybindings/vscode2";
 import { MechanicalLayoutsProvider } from "./Keyboard/MechanicalLayoutsProvider";
 import { UrlQueryController } from "./UrlQueryController";
+import {
+	KeyBindingsProvider,
+	KeyBindingSet,
+} from "./keybindings/KeyBindingsProvider";
 
 export class Model {
 	public readonly mechanicalLayoutsProvider = new MechanicalLayoutsProvider();
@@ -24,10 +27,29 @@ export class Model {
 		this.mechanicalLayoutsProvider.defaultLayout,
 		this.functionalLayoutsProvider.defaultLayout
 	);
-	public readonly keyBindings = KeyBindings.from(getVsCodeBindings());
+
+	public readonly keyBindingsProvider = new KeyBindingsProvider();
 
 	@observable
-	public activeKeyBindings = this.keyBindings;
+	private _currentKeyBindingSet = this.keyBindingsProvider.getKeyBindingSets()[0];
+
+	public get currentKeyBindingSet(): KeyBindingSet {
+		return this._currentKeyBindingSet;
+	}
+
+	@action
+	public setCurrentKeyBindingSet(set: KeyBindingSet) {
+		this._currentKeyBindingSet = set;
+		this.activeKeyBindings = this.currentKeyBindings;
+	}
+
+	@computed
+	public get currentKeyBindings(): KeyBindingTrie {
+		return KeyBindingTrie.from(this.currentKeyBindingSet.keyBindings);
+	}
+
+	@observable
+	public activeKeyBindings = this.currentKeyBindings;
 
 	@observable
 	public activeKeyBindingsPath: KeyWithModifiers[] = [];
@@ -45,7 +67,10 @@ export class Model {
 			vks.has(KnownVirtualKeys.ShiftL) ||
 			vks.has(KnownVirtualKeys.ShiftR);
 
-		return new Modifiers(hasShift, hasAlt, hasCtrl);
+		const hasMeta =
+			vks.has(KnownVirtualKeys.MetaL) || vks.has(KnownVirtualKeys.MetaR);
+
+		return new Modifiers(hasShift, hasAlt, hasCtrl, hasMeta);
 	}
 
 	public findKeyBindings(key: VirtualKey): KeyBindingsResult {
@@ -55,7 +80,7 @@ export class Model {
 	}
 
 	public resetCurrentKeyBindingPath() {
-		this.activeKeyBindings = this.keyBindings;
+		this.activeKeyBindings = this.currentKeyBindings;
 		this.activeKeyBindingsPath.length = 0;
 	}
 

@@ -12,6 +12,7 @@ export class UrlQueryController {
 
 			searchParams.set("mechanicalLayout", kbd.mechanicalLayout.name);
 			searchParams.set("functionalLayout", kbd.functionalLayout.name);
+			searchParams.set("app", model.currentKeyBindingSet.id);
 
 			window.history.pushState(
 				undefined,
@@ -43,6 +44,16 @@ export class UrlQueryController {
 			);
 			if (l) {
 				kbd.setFunctionalLayout(l);
+			}
+		}
+
+		const app = searchParams.get("app");
+		if (app) {
+			const curSet = this.model.keyBindingsProvider.findKeyBindingSet(
+				app
+			);
+			if (curSet) {
+				this.model.setCurrentKeyBindingSet(curSet);
 			}
 		}
 	}

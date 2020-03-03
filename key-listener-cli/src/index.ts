@@ -10,25 +10,30 @@ interface Data {
 	run(): Promise<void>;
 }
 
-const cli = createDefaultCli<Data>().addCmd({
-	getData: () => ({
-		async run() {
-			console.log("main");
-			iohook.useRawcode(true);
+const cli = createDefaultCli<() => Promise<void>>().addCmd({
+	getData: () => async () => {
+		console.log("main");
+		iohook.useRawcode(true);
 
-			let i = 0;
+		let i = 0;
 
-			iohook.on("keydown", data => {
-				console.log("down", data, new Date(), i++);
-			});
+		iohook.on("keydown", data => {
+			const keycode: number = data.keycode;
 
-			iohook.start();
-		},
-	}),
+			console.log(
+				"down",
+				data,
+				{ keycode: keycode.toString(16) },
+				new Date(),
+				i++
+			);
+		});
+		iohook.start();
+	},
 });
 
 runDefaultCli({
 	cli,
-	dataHandler: data => data.run(),
+	dataHandler: data => data(),
 	info: cliInfoFromPackageJson(join(__dirname, "../package.json")),
 });

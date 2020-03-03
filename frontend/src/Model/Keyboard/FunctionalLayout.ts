@@ -12,6 +12,7 @@ export abstract class FunctionalLayoutState {
 	public abstract findScanCodeForFunction(
 		fn: FunctionSymbol
 	): ScanCode | undefined;
+	//public abstract findScanCodeFor
 }
 
 export interface KeyFunction {

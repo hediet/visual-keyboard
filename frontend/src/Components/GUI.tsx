@@ -20,6 +20,8 @@ import classNames = require("classnames");
 import { AutoResize, Stretch } from "./AutoResize";
 import { svg as githubSvg } from "simple-icons/icons/github";
 import { svg as twitterSvg } from "simple-icons/icons/twitter";
+import { KeyBindingSet } from "../Model/keybindings/KeyBindingsProvider";
+import { getJsCodeFromScanCode } from "../Model/JsKeycodes";
 
 class Select<T> extends React.Component<{
 	value: T;
@@ -39,7 +41,9 @@ class Select<T> extends React.Component<{
 				}}
 			>
 				{values.map((l, idx) => (
-					<option value={idx}>{getLabel(l)}</option>
+					<option key={idx} value={idx}>
+						{getLabel(l)}
+					</option>
 				))}
 			</HTMLSelect>
 		);
@@ -76,6 +80,14 @@ export class GUI extends React.Component<{ model: Model }, {}> {
 							onChange={e =>
 								model.keyboard.setFunctionalLayout(e)
 							}
+						/>
+					</div>
+					<div className="part-Header-Item">
+						<Select<KeyBindingSet>
+							value={model.currentKeyBindingSet}
+							values={model.keyBindingsProvider.getKeyBindingSets()}
+							getLabel={v => `${v.applicationName} ${v.osName}`}
+							onChange={e => model.setCurrentKeyBindingSet(e)}
 						/>
 					</div>
 
@@ -152,7 +164,7 @@ export class GUI extends React.Component<{ model: Model }, {}> {
 				</div>
 
 				<div className="part-Title">
-					<h1>VS Code Keybindings</h1>
+					<h1>Interactive VS Code Keybindings</h1>
 				</div>
 				<div className="part-Keyboard">
 					<AutoResize stretch={Stretch.Uniform} alignVertical="top">
@@ -175,27 +187,57 @@ class KeyboardComponent extends React.Component<
 	render() {
 		const kbd = this.props.keyboard;
 		const l = kbd.mechanicalLayout;
+		const f = kbd.functionalLayout;
+
+		function getTag(key: MechanicalKeyDef): string {
+			const fn = f.defaultState.getFunction(key.scanCode);
+			if (fn) {
+				if (fn.virtualKey) {
+					return fn.virtualKey.id;
+				}
+			}
+			return key.id;
+		}
+
+		const set = new Set<string>();
+		function getId(key: MechanicalKeyDef): string {
+			const tag = getTag(key);
+			let i = 0;
+			while (true) {
+				const id = `${tag}${i++}`;
+				if (!set.has(id)) {
+					set.add(id);
+					return id;
+				}
+			}
+		}
+
+		const keys = l.keys;
+		const sortedKeys = keys
+			.map(key => ({ key, id: getId(key) }))
+			.sort((a, b) => a.id.localeCompare(b.id));
+
 		return (
 			<div
 				className="component-Keyboard"
 				style={{ width: l.width, height: l.height }}
 			>
-				{l.keys.map(k => (
+				{sortedKeys.map(({ id, key }) => (
 					<div
-						key={k.id}
+						key={id}
 						className="part-Key"
 						style={{
 							transition: "all 1s",
-							left: k.x,
-							top: k.y,
-							width: k.width,
-							height: k.height,
+							left: key.x,
+							top: key.y,
+							width: key.width,
+							height: key.height,
 						}}
 					>
 						<Key
 							model={this.props.model}
 							keyboard={kbd}
-							keyDef={k}
+							keyDef={key}
 						/>
 					</div>
 				))}
@@ -223,8 +265,12 @@ class Key extends React.Component<{
 			const r = model.findKeyBindings(keyFn.virtualKey);
 			if (r.bindings.length > 0) {
 				action = r.bindings.map(b => b.action.shortName)[0];
-			} else if (r.followingKeyBindings) {
-				action = "...";
+			}
+			if (r.followingKeyBindings) {
+				if (!action) {
+					action = "";
+				}
+				action += " ...";
 			}
 		}
 
@@ -239,12 +285,12 @@ class Key extends React.Component<{
 				text = keyFn.text;
 			}
 		}
-		//text = keyDef.scanCode.toString();
+		//text = keyDef.scanCode.code.toString();
 		/*if (defaultFn && defaultFn.virtualKey) {
 			text = defaultFn.virtualKey.name;
 		}
 		action = getJsCodeFromScanCode(keyDef.scanCode)!;
-*/
+		*/
 		//action = `${virtualKey}, ${keyDef.scanCode.code}`;
 		//action = keyDef.scanCode.toString();
 		//text = getJsCodeFromScanCode(keyDef.scanCode);

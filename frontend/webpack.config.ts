@@ -34,7 +34,9 @@ module.exports = {
 	},
 	plugins: [
 		new CleanWebpackPlugin(),
-		new HtmlWebpackPlugin(),
+		new HtmlWebpackPlugin({
+			title: "VS Code Keybindings",
+		}),
 		new ForkTsCheckerWebpackPlugin(),
 	],
 } as webpack.Configuration;

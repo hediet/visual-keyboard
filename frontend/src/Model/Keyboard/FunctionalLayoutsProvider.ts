@@ -1,4 +1,7 @@
 import { FunctionalLayout, FunctionalLayoutImpl } from "./FunctionalLayout";
+import * as usQwerty from "../../../data/functional-layouts/us.json";
+
+export const UsQwertyLayout = new FunctionalLayoutImpl(usQwerty);
 
 export class FunctionalLayoutsProvider {
 	private layouts: FunctionalLayout[];
