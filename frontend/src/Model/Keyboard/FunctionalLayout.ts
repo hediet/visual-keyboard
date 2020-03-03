@@ -72,7 +72,7 @@ export class FunctionalLayoutImpl extends FunctionalLayout {
 			return best;
 		}
 
-		super("neo", getState(new Set())!);
+		super(data.name, getState(new Set())!);
 	}
 }
 

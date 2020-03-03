@@ -1,4 +1,3 @@
-import neoLayout = require("../../../data/functional-layouts/de.json");
 import { observable, action, computed } from "mobx";
 import { ScanCode, VirtualKey } from "./primitives";
 import { MechanicalLayout } from "./MechanicalLayout";
@@ -16,13 +15,24 @@ export class Keyboard {
 	public mechanicalLayout: MechanicalLayout;
 
 	@observable
-	public functionalLayout: FunctionalLayout = new FunctionalLayoutImpl(
-		neoLayout
-	);
+	private _functionalLayout!: FunctionalLayout;
+
+	public get functionalLayout(): FunctionalLayout {
+		return this._functionalLayout;
+	}
+
+	@action
+	public setFunctionalLayout(newLayout: FunctionalLayout) {
+		this._functionalLayout = newLayout;
+		const s = [...this.pressedKeys.values()];
+		this.reset();
+		for (const k of s) {
+			this.handleButtonPress(k);
+		}
+	}
 
 	@observable
-	public currentFunctionalLayoutState: FunctionalLayoutState = this
-		.functionalLayout.defaultState;
+	public currentFunctionalLayoutState!: FunctionalLayoutState;
 
 	@observable
 	private readonly _pressedKeys = new Map<ScanCode, () => void>();
@@ -41,8 +51,12 @@ export class Keyboard {
 	}>();
 	public readonly onKeyPressed = this._onKeyPressed.asEvent();
 
-	constructor(mechanicalLayout: MechanicalLayout) {
+	constructor(
+		mechanicalLayout: MechanicalLayout,
+		functionalLayout: FunctionalLayout
+	) {
 		this.mechanicalLayout = mechanicalLayout;
+		this.setFunctionalLayout(functionalLayout);
 	}
 
 	@action

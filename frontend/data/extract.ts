@@ -1,11 +1,11 @@
 import { readFileSync, writeFileSync } from "fs";
-import { FunctionalKeyboardLayout } from "../src/model/data";
+import { FunctionalLayoutData } from "../src/model/Keyboard/";
 
 const str = readFileSync("./foo.json", { encoding: "utf8" });
 
 const data = JSON.parse(str).Mappings;
 
-const x: FunctionalKeyboardLayout = {
+const x: FunctionalLayoutData = {
 	name: "test",
 	modes: {},
 };

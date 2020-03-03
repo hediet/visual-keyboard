@@ -143,7 +143,7 @@ export const KnownVirtualKeys = {
 	Oem4: VirtualKey.register({ id: "Oem4" }),
 	Space: VirtualKey.register({ id: "Space" }),
 
-	NumLock: VirtualKey.register({ id: "NumLock" }),
+	NumLock: VirtualKey.register({ id: "NumLock", simpleName: "Num" }),
 	NumDiv: VirtualKey.register({ id: "NumDiv" }),
 	NumMul: VirtualKey.register({
 		id: "NumMul",
@@ -157,7 +157,7 @@ export const KnownVirtualKeys = {
 		id: "NumAdd",
 		alternativeIds: ["NumpadAdd"],
 	}),
-	NumEnter: VirtualKey.register({ id: "NumEnter" }),
+	NumEnter: VirtualKey.register({ id: "NumEnter", simpleName: "Enter" }),
 	NumDec: VirtualKey.register({ id: "NumDec" }),
 	Num1: VirtualKey.register({ id: "Num1", alternativeIds: ["Numpad1"] }),
 	Num2: VirtualKey.register({ id: "Num2", alternativeIds: ["Numpad2"] }),
@@ -169,4 +169,9 @@ export const KnownVirtualKeys = {
 	Num8: VirtualKey.register({ id: "Num8", alternativeIds: ["Numpad8"] }),
 	Num9: VirtualKey.register({ id: "Num9", alternativeIds: ["Numpad9"] }),
 	Num0: VirtualKey.register({ id: "Num0", alternativeIds: ["Numpad0"] }),
+
+	CapsLock: VirtualKey.register({ id: "CapsLock", simpleName: "Caps Lock" }),
+
+	Mod3: VirtualKey.register({ id: "Mod3", simpleName: "Mod 3" }),
+	Mod4: VirtualKey.register({ id: "Mod4", simpleName: "Mod 4" }),
 };

@@ -18,7 +18,8 @@
 		"mobx-react": "^6.1.1",
 		"popper.js": "^1.15.0",
 		"react": "^16.8.6",
-		"react-dom": "^16.8.6"
+		"react-dom": "^16.8.6",
+		"simple-icons": "^2.5.0"
 	},
 	"devDependencies": {
 		"@types/classnames": "^2.2.8",

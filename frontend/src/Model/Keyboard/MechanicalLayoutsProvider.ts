@@ -11,17 +11,20 @@ export class MechanicalLayoutsProvider {
 		);
 
 		this.layouts = context.keys().map((filename: string) => {
-			console.log(filename);
 			const content = context(filename);
 			return getMechanicalKeyboardLayout(content);
 		});
 	}
 
-	getLayouts(): MechanicalLayout[] {
+	public findLayout(name: string): MechanicalLayout | undefined {
+		return this.layouts.find(l => l.name === name);
+	}
+
+	public getLayouts(): MechanicalLayout[] {
 		return this.layouts;
 	}
 
-	get defaultLayout(): MechanicalLayout {
+	public get defaultLayout(): MechanicalLayout {
 		return this.layouts[0];
 	}
 }

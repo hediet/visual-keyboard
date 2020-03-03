@@ -1,37 +1,167 @@
 import { observer } from "mobx-react";
 import * as React from "react";
-import { Model, Keyboard, MechanicalKeyDef } from "../Model";
-import { Button, MenuItem, HTMLSelect } from "@blueprintjs/core";
-import { runInAction } from "mobx";
+import {
+	Model,
+	Keyboard,
+	MechanicalKeyDef,
+	MechanicalLayout,
+	FunctionalLayout,
+} from "../Model";
+import {
+	Button,
+	MenuItem,
+	HTMLSelect,
+	Tag,
+	Icon,
+	AnchorButton,
+	Checkbox,
+} from "@blueprintjs/core";
 import classNames = require("classnames");
-import { KeyWithModifiers } from "../Model/keybindings";
-import { getJsCodeFromScanCode } from "../Model/JsKeycodes";
+import { AutoResize, Stretch } from "./AutoResize";
+import { svg as githubSvg } from "simple-icons/icons/github";
+import { svg as twitterSvg } from "simple-icons/icons/twitter";
+
+class Select<T> extends React.Component<{
+	value: T;
+	values: T[];
+	getLabel: (val: T) => string;
+	onChange: (newVal: T) => void;
+}> {
+	render() {
+		const { value, values, onChange, getLabel } = this.props;
+		return (
+			<HTMLSelect
+				value={values.indexOf(value)}
+				onChange={e => {
+					const selectedIdx = +e.currentTarget.value;
+					const selected = values[selectedIdx];
+					onChange(selected);
+				}}
+			>
+				{values.map((l, idx) => (
+					<option value={idx}>{getLabel(l)}</option>
+				))}
+			</HTMLSelect>
+		);
+	}
+}
 
 @observer
 export class GUI extends React.Component<{ model: Model }, {}> {
 	render() {
 		const model = this.props.model;
 		return (
-			<div>
-				<HTMLSelect
-					onChange={e => {
-						const l = model.mechanicalLayoutsProvider
-							.getLayouts()
-							.find(l => l.name === e.currentTarget.value);
-						console.log(l, e.currentTarget.value);
-						if (l) {
-							model.keyboard.mechanicalLayout = l;
-						}
+			<div className="component-GUI bp3-dark">
+				<div
+					className="part-Header"
+					style={{
+						display: "flex",
 					}}
 				>
-					{model.mechanicalLayoutsProvider.getLayouts().map(l => (
-						<option>{l.name}</option>
+					<div className="part-Header-Item">
+						<Select<MechanicalLayout>
+							value={model.keyboard.mechanicalLayout}
+							values={model.mechanicalLayoutsProvider.getLayouts()}
+							getLabel={v => `${v.name} Keyboard`}
+							onChange={e =>
+								(model.keyboard.mechanicalLayout = e)
+							}
+						/>
+					</div>
+					<div className="part-Header-Item">
+						<Select<FunctionalLayout>
+							value={model.keyboard.functionalLayout}
+							values={model.functionalLayoutsProvider.getLayouts()}
+							getLabel={v => `${v.name} Layout`}
+							onChange={e =>
+								model.keyboard.setFunctionalLayout(e)
+							}
+						/>
+					</div>
+
+					<div
+						className="part-Header-Item"
+						style={{ display: "flex", alignItems: "center" }}
+					>
+						<Checkbox
+							label="Prevent Default Key Action"
+							style={{ margin: 0 }}
+							checked={model.preventDefault}
+							onChange={e =>
+								(model.preventDefault = e.currentTarget.checked)
+							}
+						/>
+					</div>
+
+					{model.activeKeyBindingsPath.map((key, idx) => (
+						<div key={idx} className="part-Header-Item">
+							<Tag
+								children={key.toString()}
+								large={true}
+								intent={"primary"}
+								onRemove={() =>
+									model.resetCurrentKeyBindingPath()
+								}
+							/>
+						</div>
 					))}
-				</HTMLSelect>
-				<KeyboardComponent
-					model={this.props.model}
-					keyboard={this.props.model.keyboard}
-				/>
+
+					<div
+						className="part-Header-Item"
+						style={{ marginLeft: "auto" }}
+					>
+						<Button intent={"primary"}>
+							Get The VS Code Extension
+						</Button>
+					</div>
+
+					<div className="part-Header-Item">
+						<AnchorButton
+							icon={
+								<svg
+									width={18}
+									height={18}
+									fill={"white"}
+									dangerouslySetInnerHTML={{
+										__html: githubSvg,
+									}}
+								/>
+							}
+							href="https://github.com/hediet/visual-keyboard"
+						>
+							Github
+						</AnchorButton>
+					</div>
+					<div className="part-Header-Item" style={{ padding: 0 }}>
+						<AnchorButton
+							icon={
+								<svg
+									width={18}
+									height={18}
+									fill={"white"}
+									dangerouslySetInnerHTML={{
+										__html: twitterSvg,
+									}}
+								/>
+							}
+							href="https://twitter.com/intent/follow?screen_name=hediet_dev"
+						>
+							Twitter
+						</AnchorButton>
+					</div>
+				</div>
+
+				<div className="part-Title">
+					<h1>VS Code Keybindings</h1>
+				</div>
+				<div className="part-Keyboard">
+					<AutoResize stretch={Stretch.Uniform} alignVertical="top">
+						<KeyboardComponent
+							model={this.props.model}
+							keyboard={this.props.model.keyboard}
+						/>
+					</AutoResize>
+				</div>
 			</div>
 		);
 	}
@@ -89,8 +219,8 @@ class Key extends React.Component<{
 
 		let action = undefined;
 
-		if (keyFn) {
-			const r = model.findKeyBindings(keyFn.virtualKey!);
+		if (keyFn && keyFn.virtualKey) {
+			const r = model.findKeyBindings(keyFn.virtualKey);
 			if (r.bindings.length > 0) {
 				action = r.bindings.map(b => b.action.shortName)[0];
 			} else if (r.followingKeyBindings) {
@@ -98,9 +228,16 @@ class Key extends React.Component<{
 			}
 		}
 
+		let virtualKey;
 		let text = "";
 		if (keyFn) {
-			text = keyFn.text ? keyFn.text : keyFn.virtualKey!.format();
+			if (keyFn.virtualKey) {
+				text = keyFn.virtualKey.format();
+				virtualKey = keyFn.virtualKey.id;
+			}
+			if (keyFn.text) {
+				text = keyFn.text;
+			}
 		}
 		//text = keyDef.scanCode.toString();
 		/*if (defaultFn && defaultFn.virtualKey) {
@@ -108,8 +245,7 @@ class Key extends React.Component<{
 		}
 		action = getJsCodeFromScanCode(keyDef.scanCode)!;
 */
-		//action = keyDef.scanCode.code;
-		//action = keyDef.scanCode.code;
+		//action = `${virtualKey}, ${keyDef.scanCode.code}`;
 		//action = keyDef.scanCode.toString();
 		//text = getJsCodeFromScanCode(keyDef.scanCode);
 		return (
@@ -117,12 +253,23 @@ class Key extends React.Component<{
 				className={classNames(
 					"component-Key",
 					keyboard.isKeyPressed(keyDef.scanCode) && "pressed",
-					model.activeKey === keyDef.scanCode && "active"
+					model.activeKey === keyDef.scanCode && "active",
+					virtualKey && `virtualKey-${virtualKey}`
 				)}
 				onClick={() => keyboard.handleButtonToggle(keyDef.scanCode)}
 			>
 				<div className="part-KeyText">{text}</div>
-				<div className="part-Action">{action}</div>
+				<div
+					className="part-Action"
+					style={{
+						flex: "1 1 0",
+						minHeight: 0,
+					}}
+				>
+					<AutoResize maxZoom={1} stretch={Stretch.Uniform}>
+						{action}
+					</AutoResize>
+				</div>
 			</button>
 		);
 	}

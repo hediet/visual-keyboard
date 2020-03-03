@@ -46,13 +46,13 @@ export class Modifiers {
 	toString() {
 		const items = new Array<string>();
 		if (this.shift) {
-			items.push("shift");
+			items.push("Shift");
 		}
 		if (this.alt) {
-			items.push("alt");
+			items.push("Alt");
 		}
 		if (this.ctrl) {
-			items.push("ctrl");
+			items.push("Ctrl");
 		}
 		return items.join("+");
 	}
