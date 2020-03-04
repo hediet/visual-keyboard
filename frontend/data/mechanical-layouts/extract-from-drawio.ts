@@ -1,8 +1,27 @@
 import { readFileSync, writeFileSync } from "fs";
-import { MechanicalLayoutData } from "../../src/model/Keyboard/data";
+import { MechanicalLayoutData } from "../../src/model/Keyboard";
+import { ScanCode } from "../../src/model/Keyboard/primitives";
+import { getJsCodeFromScanCode } from "../../src/model/JsKeycodes";
 
 const r = /value="(.*?)".*?\n.*x="(.*?)" y="(.*?)" width="(.*?)" height="(.*?)"/g;
 const str = readFileSync("./ansi.drawio.xml", { encoding: "utf8" });
+
+/*
+const r2 = /value="(.*?)"/g;
+const newStr = str.replace(r2, (val, ...args) => {
+	const v = args[0];
+	const s = ScanCode.from(v);
+	const v2 = getJsCodeFromScanCode(s);
+	if (v2) {
+		return `value="${v2}"`;
+	}
+	return val;
+});
+
+writeFileSync("./iso.drawio.xml", newStr, { encoding: "utf8" });
+
+throw "";
+*/
 
 const extractionResults: {
 	value: string;

@@ -1,30 +1,22 @@
 export * from "./VirtualKey";
 
-export class ScanCode {
-	private static readonly instances = new Map<number, ScanCode>();
-	public static from(val: number | string): ScanCode {
-		if (typeof val === "string") {
-			if (val.startsWith("0x")) {
-				val = parseInt(val.substr(2), 16);
-			} else {
-				val = parseInt(val, 10);
-			}
-		}
-
-		let existing = this.instances.get(val);
+export class PhysicalKey {
+	private static readonly instances = new Map<string, PhysicalKey>();
+	public static from(id: string): PhysicalKey {
+		let existing = this.instances.get(id);
 		if (!existing) {
-			existing = new ScanCode(val);
-			this.instances.set(val, existing);
+			existing = new PhysicalKey(id);
+			this.instances.set(id, existing);
 		}
 		return existing;
 	}
 
-	private readonly _brand = "ScanCode";
+	private readonly _brand = "PhysicalKey";
 
-	private constructor(public readonly code: number) {}
+	private constructor(public readonly name: string) {}
 
 	public toString() {
-		return "0x" + this.code.toString(16);
+		return this.name;
 	}
 }
 

@@ -1,4 +1,4 @@
-import { ScanCode } from "./primitives";
+import { PhysicalKey } from "./primitives";
 
 export class MechanicalLayout {
 	public constructor(
@@ -16,6 +16,6 @@ export class MechanicalKeyDef {
 		public readonly y: number,
 		public readonly width: number,
 		public readonly height: number,
-		public readonly scanCode: ScanCode
+		public readonly scanCode: PhysicalKey
 	) {}
 }

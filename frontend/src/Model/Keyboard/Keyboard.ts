@@ -1,5 +1,5 @@
 import { observable, action, computed } from "mobx";
-import { ScanCode, VirtualKey } from "./primitives";
+import { PhysicalKey, VirtualKey } from "./primitives";
 import { MechanicalLayout } from "./MechanicalLayout";
 import {
 	FunctionalLayout,
@@ -27,7 +27,7 @@ export class Keyboard {
 		const s = [...this.pressedKeys.values()];
 		this.reset();
 		for (const k of s) {
-			this.handleButtonPress(k);
+			this.handleKeyPress(k);
 		}
 	}
 
@@ -35,10 +35,10 @@ export class Keyboard {
 	public currentFunctionalLayoutState!: FunctionalLayoutState;
 
 	@observable
-	private readonly _pressedKeys = new Map<ScanCode, () => void>();
+	private readonly _pressedKeys = new Map<PhysicalKey, () => void>();
 
 	@computed
-	public get pressedKeys(): ReadonlySet<ScanCode> {
+	public get pressedKeys(): ReadonlySet<PhysicalKey> {
 		return new Set(this._pressedKeys.keys());
 	}
 
@@ -46,33 +46,14 @@ export class Keyboard {
 	public readonly pressedVirtualKeys = new Set<VirtualKey>();
 
 	private readonly _onKeyPressed = new EventEmitter<{
-		key: ScanCode;
+		key: PhysicalKey;
 		keyFunction: KeyFunction;
 	}>();
 	public readonly onKeyPressed = this._onKeyPressed.asEvent();
 
-	constructor(
-		mechanicalLayout: MechanicalLayout,
-		functionalLayout: FunctionalLayout
-	) {
+	constructor(mechanicalLayout: MechanicalLayout, functionalLayout: FunctionalLayout) {
 		this.mechanicalLayout = mechanicalLayout;
 		this.setFunctionalLayout(functionalLayout);
-	}
-
-	@action
-	public handleKeyDown(keyCodeName: string): void {
-		const scanCode = getScanCodeFromJsCode(keyCodeName);
-		if (scanCode) {
-			this.handleButtonPress(scanCode);
-		}
-	}
-
-	@action
-	public handleKeyUp(keyCodeName: string): void {
-		const scanCode = getScanCodeFromJsCode(keyCodeName);
-		if (scanCode) {
-			this.handleButtonRelease(scanCode);
-		}
 	}
 
 	@action
@@ -82,7 +63,8 @@ export class Keyboard {
 		this.currentFunctionalLayoutState = this.functionalLayout.defaultState;
 	}
 
-	private handleButtonPress(key: ScanCode): void {
+	@action
+	public handleKeyPress(key: PhysicalKey): void {
 		if (this._pressedKeys.has(key)) {
 			return;
 		}
@@ -108,7 +90,8 @@ export class Keyboard {
 		}
 	}
 
-	private handleButtonRelease(key: ScanCode): void {
+	@action
+	public handleKeyRelease(key: PhysicalKey): void {
 		const fn = this._pressedKeys.get(key);
 		if (!fn) {
 			return;
@@ -124,15 +107,15 @@ export class Keyboard {
 	}
 
 	@action
-	public handleButtonToggle(key: ScanCode): void {
+	public handleButtonToggle(key: PhysicalKey): void {
 		if (this._pressedKeys.has(key)) {
-			this.handleButtonRelease(key);
+			this.handleKeyRelease(key);
 		} else {
-			this.handleButtonPress(key);
+			this.handleKeyPress(key);
 		}
 	}
 
-	public isKeyPressed(keyDef: ScanCode): boolean {
+	public isKeyPressed(keyDef: PhysicalKey): boolean {
 		return this.pressedKeys.has(keyDef);
 	}
 }

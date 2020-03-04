@@ -2,22 +2,14 @@ import { observable, action, runInAction, autorun, computed } from "mobx";
 import {
 	Keyboard,
 	KnownVirtualKeys,
-	ScanCode,
+	PhysicalKey,
 	VirtualKey,
 	FunctionalLayoutsProvider,
 } from "./Keyboard";
-import {
-	KeyBindingTrie,
-	Modifiers,
-	KeyWithModifiers,
-	KeyBindingsResult,
-} from "./keybindings";
+import { KeyBindingTrie, Modifiers, KeyWithModifiers, KeyBindingsResult } from "./keybindings";
 import { MechanicalLayoutsProvider } from "./Keyboard/MechanicalLayoutsProvider";
 import { UrlQueryController } from "./UrlQueryController";
-import {
-	KeyBindingsProvider,
-	KeyBindingSet,
-} from "./keybindings/KeyBindingsProvider";
+import { KeyBindingsProvider, KeyBindingSet } from "./keybindings/KeyBindingsProvider";
 
 export class Model {
 	public readonly mechanicalLayoutsProvider = new MechanicalLayoutsProvider();
@@ -59,16 +51,11 @@ export class Model {
 
 	get activeModifiers(): Modifiers {
 		const vks = this.keyboard.pressedVirtualKeys;
-		const hasCtrl =
-			vks.has(KnownVirtualKeys.CtrlL) || vks.has(KnownVirtualKeys.CtrlR);
-		const hasAlt =
-			vks.has(KnownVirtualKeys.AltL) || vks.has(KnownVirtualKeys.AltR);
-		const hasShift =
-			vks.has(KnownVirtualKeys.ShiftL) ||
-			vks.has(KnownVirtualKeys.ShiftR);
+		const hasCtrl = vks.has(KnownVirtualKeys.CtrlL) || vks.has(KnownVirtualKeys.CtrlR);
+		const hasAlt = vks.has(KnownVirtualKeys.AltL) || vks.has(KnownVirtualKeys.AltR);
+		const hasShift = vks.has(KnownVirtualKeys.ShiftL) || vks.has(KnownVirtualKeys.ShiftR);
 
-		const hasMeta =
-			vks.has(KnownVirtualKeys.MetaL) || vks.has(KnownVirtualKeys.MetaR);
+		const hasMeta = vks.has(KnownVirtualKeys.MetaL) || vks.has(KnownVirtualKeys.MetaR);
 
 		return new Modifiers(hasShift, hasAlt, hasCtrl, hasMeta);
 	}
@@ -109,31 +96,31 @@ export class Model {
 		});
 
 		window.addEventListener("keydown", e => {
-			this.keyboard.handleKeyDown(e.code);
+			const physicalKey = PhysicalKey.from(e.code);
+			this.keyboard.handleKeyPress(physicalKey);
 			if (this.preventDefault) {
 				e.preventDefault();
 			}
 			e.stopPropagation();
 		});
 		window.addEventListener("keyup", e => {
-			this.keyboard.handleKeyUp(e.code);
+			const physicalKey = PhysicalKey.from(e.code);
+			this.keyboard.handleKeyRelease(physicalKey);
 			if (this.preventDefault) {
 				e.preventDefault();
 			}
 			e.stopPropagation();
 		});
 
-		const keysSorted = this.keyboard.mechanicalLayout.keys
-			.slice()
-			.sort((a, b) => {
-				if (a.y !== b.y) {
-					return a.y - b.y;
-				}
-				if (a.x !== b.x) {
-					return a.x - b.x;
-				}
-				return 0;
-			});
+		const keysSorted = this.keyboard.mechanicalLayout.keys.slice().sort((a, b) => {
+			if (a.y !== b.y) {
+				return a.y - b.y;
+			}
+			if (a.x !== b.x) {
+				return a.x - b.x;
+			}
+			return 0;
+		});
 
 		/*
 		const str = `ESC FK01 FK02 FK03 FK04 FK05 FK06 FK07 FK08 FK09 FK10 FK11 FK12 PRSC SCLK PAUS 
@@ -175,5 +162,5 @@ LCTL LWIN LALT SPCE RALT RWIN MENU RCTL LEFT DOWN RIGHT                         
 	}
 
 	@observable
-	activeKey: ScanCode | undefined;
+	activeKey: PhysicalKey | undefined;
 }

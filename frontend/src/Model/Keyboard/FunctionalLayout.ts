@@ -1,4 +1,4 @@
-import { ScanCode, FunctionSymbol, VirtualKey } from "./primitives";
+import { PhysicalKey, FunctionSymbol, VirtualKey } from "./primitives";
 
 export abstract class FunctionalLayout {
 	constructor(
@@ -8,10 +8,8 @@ export abstract class FunctionalLayout {
 }
 
 export abstract class FunctionalLayoutState {
-	public abstract getFunction(scanCode: ScanCode): KeyFunction | undefined;
-	public abstract findScanCodeForFunction(
-		fn: FunctionSymbol
-	): ScanCode | undefined;
+	public abstract getFunction(scanCode: PhysicalKey): KeyFunction | undefined;
+	public abstract findScanCodeForFunction(fn: FunctionSymbol): PhysicalKey | undefined;
 	//public abstract findScanCodeFor
 }
 
@@ -40,11 +38,7 @@ export class FunctionalLayoutImpl extends FunctionalLayout {
 		function lookupState(name: string): BaseFunctionalLayoutStateImpl {
 			let v = modes.get(name);
 			if (!v) {
-				v = new BaseFunctionalLayoutStateImpl(
-					name,
-					data.modes[name],
-					lookupState
-				);
+				v = new BaseFunctionalLayoutStateImpl(name, data.modes[name], lookupState);
 				modes.set(name, v);
 			}
 			return v;
@@ -54,17 +48,12 @@ export class FunctionalLayoutImpl extends FunctionalLayout {
 			lookupState(modeName);
 		}
 
-		function getState(
-			keys: Set<ScanCode>
-		): FunctionalLayoutStateImpl | undefined {
+		function getState(keys: Set<PhysicalKey>): FunctionalLayoutStateImpl | undefined {
 			let best = undefined;
 			let length = -1;
 			for (const m of modes.values()) {
 				for (const mod of m.modifiers) {
-					if (
-						mod.size > length &&
-						[...mod.values()].every(v => keys.has(v))
-					) {
+					if (mod.size > length && [...mod.values()].every(v => keys.has(v))) {
 						length = mod.size;
 						best = new FunctionalLayoutStateImpl(m, keys, getState);
 					}
@@ -78,8 +67,8 @@ export class FunctionalLayoutImpl extends FunctionalLayout {
 }
 
 class BaseFunctionalLayoutStateImpl extends FunctionalLayoutState {
-	private readonly functions = new Map<ScanCode, KeyFunction>();
-	public readonly modifiers: ReadonlyArray<ReadonlySet<ScanCode>>;
+	private readonly functions = new Map<PhysicalKey, KeyFunction>();
+	public readonly modifiers: ReadonlyArray<ReadonlySet<PhysicalKey>>;
 
 	constructor(
 		public readonly name: string,
@@ -96,7 +85,7 @@ class BaseFunctionalLayoutStateImpl extends FunctionalLayoutState {
 		}
 
 		this.modifiers = data.modifiers
-			? data.modifiers.map(m => new Set(m.map(k => ScanCode.from(k))))
+			? data.modifiers.map(m => new Set(m.map(k => PhysicalKey.from(k))))
 			: [];
 
 		for (const [scanCodeStr, def] of Object.entries(data.mapping)) {
@@ -104,24 +93,20 @@ class BaseFunctionalLayoutStateImpl extends FunctionalLayoutState {
 
 			f = {
 				text: def.text,
-				virtualKey: def.virtualKey
-					? VirtualKey.get(def.virtualKey)
-					: undefined,
+				virtualKey: def.virtualKey ? VirtualKey.get(def.virtualKey) : undefined,
 			};
 
-			this.functions.set(ScanCode.from(scanCodeStr), f);
+			this.functions.set(PhysicalKey.from(scanCodeStr), f);
 		}
 	}
 
-	public getFunction(scanCode: ScanCode): KeyFunction | undefined {
+	public getFunction(scanCode: PhysicalKey): KeyFunction | undefined {
 		const f = this.functions.get(scanCode);
 		return f;
 	}
 
-	public findScanCodeForFunction(fn: FunctionSymbol): ScanCode | undefined {
-		const f = [...this.functions.entries()].find(
-			v => v[1].functionSymbol === fn
-		);
+	public findScanCodeForFunction(fn: FunctionSymbol): PhysicalKey | undefined {
+		const f = [...this.functions.entries()].find(v => v[1].functionSymbol === fn);
 		if (!f) {
 			return undefined;
 		}
@@ -132,15 +117,13 @@ class BaseFunctionalLayoutStateImpl extends FunctionalLayoutState {
 class FunctionalLayoutStateImpl extends FunctionalLayoutState {
 	constructor(
 		private readonly base: BaseFunctionalLayoutStateImpl,
-		private readonly pressedKeys: ReadonlySet<ScanCode>,
-		private readonly getState: (
-			keys: Set<ScanCode>
-		) => FunctionalLayoutStateImpl | undefined
+		private readonly pressedKeys: ReadonlySet<PhysicalKey>,
+		private readonly getState: (keys: Set<PhysicalKey>) => FunctionalLayoutStateImpl | undefined
 	) {
 		super();
 	}
 
-	public getFunction(scanCode: ScanCode): KeyFunction | undefined {
+	public getFunction(scanCode: PhysicalKey): KeyFunction | undefined {
 		let f = this.base.getFunction(scanCode);
 
 		const s1 = new Set(this.pressedKeys);
@@ -161,7 +144,7 @@ class FunctionalLayoutStateImpl extends FunctionalLayoutState {
 		return f;
 	}
 
-	public findScanCodeForFunction(fn: FunctionSymbol): ScanCode | undefined {
+	public findScanCodeForFunction(fn: FunctionSymbol): PhysicalKey | undefined {
 		return this.base.findScanCodeForFunction(fn);
 	}
 }

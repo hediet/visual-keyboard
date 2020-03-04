@@ -1,5 +1,5 @@
 import { MechanicalLayout, MechanicalKeyDef } from "./MechanicalLayout";
-import { ScanCode } from "./primitives";
+import { PhysicalKey } from "./primitives";
 
 export class MechanicalLayoutsProvider {
 	private layouts: MechanicalLayout[];
@@ -35,14 +35,14 @@ function getMechanicalKeyboardLayout(def: MechanicalLayoutData) {
 		def.width,
 		def.height,
 		def.keys.map((k, idx) => {
-			const scanCode = ScanCode.from(k.scanCode);
+			const physicalKey = PhysicalKey.from(k.physicalKey);
 			return new MechanicalKeyDef(
-				scanCode.toString(),
+				physicalKey.toString(),
 				k.x,
 				k.y,
 				k.width,
 				k.height,
-				scanCode
+				physicalKey
 			);
 		})
 	);
@@ -60,7 +60,5 @@ export interface MechanicalKeyDefData {
 	y: number;
 	width: number;
 	height: number;
-
-	// hex, uppercase
-	scanCode: string;
+	physicalKey: string;
 }

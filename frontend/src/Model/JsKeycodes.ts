@@ -1,4 +1,4 @@
-import { ScanCode } from "./Keyboard/primitives";
+import { PhysicalKey } from "./Keyboard/primitives";
 
 const jsKeyCodes: Record<string, string> = {
 	AltLeft: "0x38",
@@ -104,16 +104,16 @@ const jsKeyCodes: Record<string, string> = {
 	Tab: "0xf",
 };
 
-export function getScanCodeFromJsCode(jsKeyCode: string): ScanCode | undefined {
+export function getScanCodeFromJsCode(jsKeyCode: string): PhysicalKey | undefined {
 	if (!(jsKeyCode in jsKeyCodes)) {
 		return undefined;
 	}
-	return ScanCode.from(jsKeyCodes[jsKeyCode]);
+	return PhysicalKey.from(jsKeyCodes[jsKeyCode]);
 }
 
-export function getJsCodeFromScanCode(scanCode: ScanCode): string | undefined {
+export function getJsCodeFromScanCode(scanCode: PhysicalKey): string | undefined {
 	for (const [name, val] of Object.entries(jsKeyCodes)) {
-		if (ScanCode.from(val) === scanCode) {
+		if (PhysicalKey.from(val) === scanCode) {
 			return name;
 		}
 	}
