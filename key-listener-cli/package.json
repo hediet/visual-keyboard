@@ -5,12 +5,20 @@
 	"version": "0.1.0",
 	"license": "MIT",
 	"scripts": {
-		"dev": "tsc --watch"
+		"dev": "tsc --watch",
+		"run": "node ./dist/index"
 	},
+	"main": "./dist/api",
+	"types": "./dist/api",
 	"dependencies": {
 		"@hediet/cli": "^0.6.3",
 		"@hediet/std": "^0.6.0",
-		"iohook": "^0.6.5"
+		"iohook": "^0.6.5",
+		"@hediet/typed-json-rpc": "^0.7.7",
+		"@hediet/typed-json-rpc-websocket-server": "^0.7.7",
+		"ws": "^7.2.1",
+		"rxjs": "^6.5.4",
+		"crypto-random-string": "^3.1.0"
 	},
 	"devDependencies": {
 		"@types/node": "^13.7.4"

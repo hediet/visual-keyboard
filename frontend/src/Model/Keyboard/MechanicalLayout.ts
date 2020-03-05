@@ -16,6 +16,6 @@ export class MechanicalKeyDef {
 		public readonly y: number,
 		public readonly width: number,
 		public readonly height: number,
-		public readonly scanCode: PhysicalKey
+		public readonly physicalKey: PhysicalKey
 	) {}
 }

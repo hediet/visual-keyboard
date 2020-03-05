@@ -1,11 +1,13 @@
 {
-	"name": "my-website",
+	"name": "@hediet/visual-keyboard-frontend",
 	"version": "0.0.1",
 	"scripts": {
 		"dev": "webpack-dev-server --hot",
 		"build": "webpack",
 		"pub": "gh-pages -d dist"
 	},
+	"main": "./index",
+	"types": "./index.d.ts",
 	"dependencies": {
 		"@blueprintjs/core": "^3.17.1",
 		"@blueprintjs/select": "^3.10.0",
@@ -19,7 +21,9 @@
 		"popper.js": "^1.15.0",
 		"react": "^16.8.6",
 		"react-dom": "^16.8.6",
-		"simple-icons": "^2.5.0"
+		"simple-icons": "^2.5.0",
+		"@hediet/typed-json-rpc": "^0.7.7",
+		"@hediet/typed-json-rpc-websocket": "^0.7.7"
 	},
 	"devDependencies": {
 		"@types/classnames": "^2.2.8",

@@ -1,0 +1,81 @@
+{
+	"name": "key-bindings-viewer",
+	"private": true,
+	"displayName": "Key Bindings Viewer",
+	"description": "Displays a keyboard with applicable keybindings on the keys.",
+	"icon": "docs/logo.png",
+	"version": "0.1.0",
+	"license": "MIT",
+	"engines": {
+		"vscode": "^1.35.0"
+	},
+	"publisher": "hediet",
+	"author": {
+		"email": "henning.dieterichs@live.de",
+		"name": "Henning Dieterichs"
+	},
+	"readme": "./README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/hediet/vscode-debug-visualizer.git"
+	},
+	"categories": [
+		"Other"
+	],
+	"activationEvents": [
+		"onCommand:key-bindings-viewer.open-view",
+		"onWebviewPanel:key-bindings-viewer"
+	],
+	"main": "./dist/extension.js",
+	"contributes": {
+		"commands": [
+			{
+				"command": "key-bindings-viewer.open-view",
+				"title": "Open a keyboard view"
+			}
+		],
+		"configuration": {
+			"title": "Keybindings Viewer",
+			"properties": {
+				"key-bindings-viewer.useChromeKioskMode": {
+					"type": "boolean",
+					"default": true,
+					"description": "Pop out The Keyboard View with Chrome in Kiosk Mode."
+				}
+			}
+		}
+	},
+	"scripts": {
+		"pub": "vsce publish --yarn --baseImagesUrl https://github.com/hediet/visual-keyboard/raw/master/extension-vscode --baseContentUrl https://github.com/hediet/visual-keyboard/raw/master/extension-vscode",
+		"package": "vsce package --yarn",
+		"vscode:prepublish": "yarn build",
+		"build": "webpack --mode production",
+		"dev": "shx rm -rf dist && tsc -watch -p ./"
+	},
+	"dependencies": {
+		"@hediet/std": "^0.6.0",
+		"@hediet/typed-json-rpc": "^0.7.7",
+		"@hediet/typed-json-rpc-websocket-server": "^0.7.7",
+		"chrome-launcher": "^0.12.0",
+		"@hediet/node-reload": "^0.7.3",
+		"express": "^4.17.1",
+		"open": "^7.0.2",
+		"serve-static": "^1.14.1",
+		"ws": "^7.2.1",
+		"crypto-random-string": "^3.1.0"
+	},
+	"devDependencies": {
+		"copy-webpack-plugin": "^5.1.1",
+		"@types/copy-webpack-plugin": "^5.0.0",
+		"@types/express": "^4.17.2",
+		"@types/serve-static": "^1.13.3",
+		"@types/node": "^13.7.4",
+		"@types/vscode": "1.35.0",
+		"tslint": "^6.0.0",
+		"typescript": "^3.8.2",
+		"webpack": "^4.41.6",
+		"webpack-cli": "^3.3.11",
+		"ts-loader": "^6.2.1",
+		"shx": "^0.3.2"
+	}
+}

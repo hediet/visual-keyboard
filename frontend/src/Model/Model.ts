@@ -5,11 +5,15 @@ import {
 	PhysicalKey,
 	VirtualKey,
 	FunctionalLayoutsProvider,
+	MechanicalKeyDef,
 } from "./Keyboard";
 import { KeyBindingTrie, Modifiers, KeyWithModifiers, KeyBindingsResult } from "./keybindings";
 import { MechanicalLayoutsProvider } from "./Keyboard/MechanicalLayoutsProvider";
 import { UrlQueryController } from "./UrlQueryController";
 import { KeyBindingsProvider, KeyBindingSet } from "./keybindings/KeyBindingsProvider";
+import { WebSocketStream } from "@hediet/typed-json-rpc-websocket";
+import { ConsoleRpcLogger } from "@hediet/typed-json-rpc";
+import { keyboardContract } from "@hediet/key-listener";
 
 export class Model {
 	public readonly mechanicalLayoutsProvider = new MechanicalLayoutsProvider();
@@ -112,7 +116,12 @@ export class Model {
 			e.stopPropagation();
 		});
 
-		const keysSorted = this.keyboard.mechanicalLayout.keys.slice().sort((a, b) => {
+		this.stayConnected();
+	}
+
+	@computed
+	private get keysSorted(): MechanicalKeyDef[] {
+		return this.keyboard.mechanicalLayout.keys.slice().sort((a, b) => {
 			if (a.y !== b.y) {
 				return a.y - b.y;
 			}
@@ -121,8 +130,61 @@ export class Model {
 			}
 			return 0;
 		});
+	}
 
-		/*
+	@observable idx = -1;
+
+	get activeKey(): PhysicalKey | undefined {
+		if (this.idx < 0) {
+			return undefined;
+		}
+		return this.keysSorted[this.idx % this.keysSorted.length].physicalKey;
+	}
+
+	private server: typeof keyboardContract.TServerInterface | undefined;
+
+	async stayConnected(): Promise<void> {
+		while (true) {
+			try {
+				this.idx = -1;
+				const stream = await WebSocketStream.connectTo({
+					host: "localhost",
+					port: 8091,
+				});
+				const { server } = keyboardContract.getServerFromStream(
+					stream,
+					new ConsoleRpcLogger(),
+					{
+						selectNextKey: async ({}) => {
+							this.idx++;
+							return {
+								physicalKey: this.activeKey!.name,
+							};
+						},
+						onKeyEvent: async ({ action, physicalKey }) => {
+							const key = PhysicalKey.from(physicalKey);
+							if (action === "pressed") {
+								this.keyboard.handleKeyPress(key);
+							} else {
+								this.keyboard.handleKeyRelease(key);
+							}
+						},
+					}
+				);
+				/*try {
+					await server.authenticate({ secret: this.serverSecret });
+				} catch (e) {
+					console.error(e);
+				}*/
+				this.server = server;
+
+				await stream.onClosed;
+			} catch (e) {}
+		}
+	}
+}
+
+/*
 		const str = `ESC FK01 FK02 FK03 FK04 FK05 FK06 FK07 FK08 FK09 FK10 FK11 FK12 PRSC SCLK PAUS 
 TLDE AE01 AE02 AE03 AE04 AE05 AE06 AE07 AE08 AE09 AE10 AE11 AE12 BKSP INS HOME PGUP NMLK KPDV KPMU KPSU 
 TAB  AD01 AD02 AD03 AD04 AD05 AD06 AD07 AD08 AD09 AD10 AD11 AD12 BKSL DELE END PGDN KP7 KP8 KP9 KPAD 
@@ -143,7 +205,7 @@ LCTL LWIN LALT SPCE RALT RWIN MENU RCTL LEFT DOWN RIGHT                         
 		console.log(this.map);
 */
 
-		/*
+/*
 		let i = 0;
 		this.activeKey = keysSorted[i].scanCode;
 		const map: Record<string, string> = {};
@@ -159,8 +221,3 @@ LCTL LWIN LALT SPCE RALT RWIN MENU RCTL LEFT DOWN RIGHT                         
 				});
 			}
 		});*/
-	}
-
-	@observable
-	activeKey: PhysicalKey | undefined;
-}
