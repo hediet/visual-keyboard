@@ -13,7 +13,7 @@ import { UrlQueryController } from "./UrlQueryController";
 import { KeyBindingsProvider, KeyBindingSet } from "./keybindings/KeyBindingsProvider";
 import { WebSocketStream } from "@hediet/typed-json-rpc-websocket";
 import { ConsoleRpcLogger } from "@hediet/typed-json-rpc";
-import { keyboardContract } from "@hediet/key-listener";
+import { keyboardContract } from "@hediet/key-listener/dist/contract";
 
 export class Model {
 	public readonly mechanicalLayoutsProvider = new MechanicalLayoutsProvider();
@@ -36,16 +36,16 @@ export class Model {
 	@action
 	public setCurrentKeyBindingSet(set: KeyBindingSet) {
 		this._currentKeyBindingSet = set;
-		this.activeKeyBindings = this.currentKeyBindings;
+		this.activeKeyBindings = this.currentKeyBindingTrieRoot;
 	}
 
 	@computed
-	public get currentKeyBindings(): KeyBindingTrie {
+	public get currentKeyBindingTrieRoot(): KeyBindingTrie {
 		return KeyBindingTrie.from(this.currentKeyBindingSet.keyBindings);
 	}
 
 	@observable
-	public activeKeyBindings = this.currentKeyBindings;
+	public activeKeyBindings = this.currentKeyBindingTrieRoot;
 
 	@observable
 	public activeKeyBindingsPath: KeyWithModifiers[] = [];
@@ -71,7 +71,7 @@ export class Model {
 	}
 
 	public resetCurrentKeyBindingPath() {
-		this.activeKeyBindings = this.currentKeyBindings;
+		this.activeKeyBindings = this.currentKeyBindingTrieRoot;
 		this.activeKeyBindingsPath.length = 0;
 	}
 
@@ -119,20 +119,11 @@ export class Model {
 		this.stayConnected();
 	}
 
-	@computed
-	private get keysSorted(): MechanicalKeyDef[] {
-		return this.keyboard.mechanicalLayout.keys.slice().sort((a, b) => {
-			if (a.y !== b.y) {
-				return a.y - b.y;
-			}
-			if (a.x !== b.x) {
-				return a.x - b.x;
-			}
-			return 0;
-		});
-	}
-
 	@observable idx = -1;
+
+	@computed get keysSorted() {
+		return this.keyboard.mechanicalLayout.keysSortedByPosition;
+	}
 
 	get activeKey(): PhysicalKey | undefined {
 		if (this.idx < 0) {
@@ -141,15 +132,25 @@ export class Model {
 		return this.keysSorted[this.idx % this.keysSorted.length].physicalKey;
 	}
 
+	public readonly data = getData();
 	private server: typeof keyboardContract.TServerInterface | undefined;
 
+	@observable
+	public initialized = false;
+
 	async stayConnected(): Promise<void> {
+		const data = this.data.server;
+		if (!data) {
+			this.initialized = true;
+			return;
+		}
+
 		while (true) {
 			try {
 				this.idx = -1;
 				const stream = await WebSocketStream.connectTo({
 					host: "localhost",
-					port: 8091,
+					port: data.port,
 				});
 				const { server } = keyboardContract.getServerFromStream(
 					stream,
@@ -169,13 +170,37 @@ export class Model {
 								this.keyboard.handleKeyRelease(key);
 							}
 						},
+						updateSettings: async ({
+							functionalLayout,
+							mechanicalLayout,
+							keyBindingSet,
+						}) => {
+							if (functionalLayout) {
+								const l = this.functionalLayoutsProvider.findLayout(
+									functionalLayout
+								);
+								if (l) {
+									this.keyboard.setFunctionalLayout(l);
+								}
+							}
+
+							if (mechanicalLayout) {
+								const l = this.mechanicalLayoutsProvider.findLayout(
+									mechanicalLayout
+								);
+								if (l) {
+									this.keyboard.mechanicalLayout = l;
+								}
+							}
+							this.initialized = true;
+						},
 					}
 				);
-				/*try {
-					await server.authenticate({ secret: this.serverSecret });
+				try {
+					await server.authenticate({ secret: data.secret });
 				} catch (e) {
 					console.error(e);
-				}*/
+				}
 				this.server = server;
 
 				await stream.onClosed;
@@ -184,40 +209,46 @@ export class Model {
 	}
 }
 
-/*
-		const str = `ESC FK01 FK02 FK03 FK04 FK05 FK06 FK07 FK08 FK09 FK10 FK11 FK12 PRSC SCLK PAUS 
-TLDE AE01 AE02 AE03 AE04 AE05 AE06 AE07 AE08 AE09 AE10 AE11 AE12 BKSP INS HOME PGUP NMLK KPDV KPMU KPSU 
-TAB  AD01 AD02 AD03 AD04 AD05 AD06 AD07 AD08 AD09 AD10 AD11 AD12 BKSL DELE END PGDN KP7 KP8 KP9 KPAD 
-CAPS AC01 AC02 AC03 AC04 AC05 AC06 AC07 AC08 AC09 AC10 AC11 RTRN                    KP4 KP5 KP6 
-LFSH LSGT AB01 AB02 AB03 AB04 AB05 AB06 AB07 AB08 AB09 AB10 RTSH UP                      KP1 KP2 KP3 KPEN 
-LCTL LWIN LALT SPCE RALT RWIN MENU RCTL LEFT DOWN RIGHT                             KP0 KPDL 
- 
-`;
+declare const window: Window & {
+	webViewData?: { serverSecret: string; serverPort: number; headless: boolean };
+};
 
-		//const map = {} as any;
+function getData(): { server?: { secret: string; port: number }; headless: boolean } {
+	const d = window.webViewData;
+	if (d) {
+		return {
+			server: {
+				secret: d.serverSecret,
+				port: d.serverPort,
+			},
+			headless: d.headless,
+		};
+	}
 
-		const parts = str.split(" ").filter(e => e.trim() !== "");
-		for (const key of keysSorted) {
-			const name = parts.shift();
-			this.map[key.scanCode.toString()] = name;
+	const searchParams = new URLSearchParams(window.location.search);
+
+	const portStr = searchParams.get("serverPort");
+	let port: number | undefined;
+	if (portStr !== null) {
+		port = parseInt(portStr);
+	}
+	let secret = searchParams.get("serverSecret");
+	if (secret === null) {
+		if (port !== undefined) {
+			console.error("No Server Secret given.");
 		}
+		secret = "";
+	}
+	const headless = searchParams.get("headless") !== null;
 
-		console.log(this.map);
-*/
-
-/*
-		let i = 0;
-		this.activeKey = keysSorted[i].scanCode;
-		const map: Record<string, string> = {};
-
-		this.keyboard.onKeyPressed.sub(({ keyCodeName }) => {
-			i++;
-			map[keyCodeName] = this.activeKey!.toString();
-			if (i === keysSorted.length) {
-				console.log(JSON.stringify(map));
-			} else {
-				runInAction(() => {
-					this.activeKey = keysSorted[i].scanCode;
-				});
-			}
-		});*/
+	return {
+		headless,
+		server:
+			port === undefined
+				? undefined
+				: {
+						port,
+						secret,
+				  },
+	};
+}

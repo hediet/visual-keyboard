@@ -4,5 +4,20 @@
 		"frontend",
 		"key-listener-cli",
 		"extension-vscode"
-	]
+	],
+	"iohook": {
+		"targets": [
+			"node-59",
+			"electron-73"
+		],
+		"platforms": [
+			"win32",
+			"darwin",
+			"linux"
+		],
+		"arches": [
+			"x64",
+			"ia32"
+		]
+	}
 }

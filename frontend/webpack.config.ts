@@ -3,6 +3,7 @@ import path = require("path");
 import HtmlWebpackPlugin = require("html-webpack-plugin");
 import ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
 import { CleanWebpackPlugin } from "clean-webpack-plugin";
+import TerserPlugin = require("terser-webpack-plugin");
 
 const r = (file: string) => path.resolve(__dirname, file);
 
@@ -30,6 +31,15 @@ module.exports = {
 				loader: "ts-loader",
 				options: { transpileOnly: true },
 			},
+		],
+	},
+	optimization: {
+		minimizer: [
+			new TerserPlugin({
+				terserOptions: {
+					safari10: true,
+				},
+			}),
 		],
 	},
 	plugins: [

@@ -9,12 +9,12 @@ export class Server {
 
 	public readonly port: number;
 
-	constructor(options: { port?: number } = {}) {
+	constructor(options: { port?: number; handleClient?: (client: Client) => void } = {}) {
 		const clients = new Set<Client>();
 
 		const server = startWebSocketServer(
 			{
-				port: options.port,
+				port: options.port || 0,
 			},
 			async stream => {
 				const { client } = keyboardContract.registerServerToStream(
@@ -27,6 +27,9 @@ export class Server {
 
 				const c = new Client(client);
 				clients.add(c);
+				if (options.handleClient) {
+					options.handleClient(c);
+				}
 				await stream.onClosed;
 				clients.delete(c);
 			}
@@ -46,6 +49,6 @@ export class Server {
 	}
 }
 
-class Client {
+export class Client {
 	constructor(public readonly connection: typeof keyboardContract.TClientInterface) {}
 }

@@ -8,6 +8,13 @@ export const keyboardContract = contract({
 				action: types.union([types.literal("pressed"), types.literal("released")]),
 			}),
 		}),
+		updateSettings: notificationContract({
+			params: types.type({
+				mechanicalLayout: types.union([types.string, types.null]),
+				functionalLayout: types.union([types.string, types.null]),
+				keyBindingSet: types.union([types.string, types.null]),
+			}),
+		}),
 		selectNextKey: requestContract({
 			result: types.type({
 				physicalKey: types.string,

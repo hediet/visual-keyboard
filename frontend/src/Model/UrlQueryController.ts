@@ -14,11 +14,7 @@ export class UrlQueryController {
 			searchParams.set("functionalLayout", kbd.functionalLayout.name);
 			searchParams.set("app", model.currentKeyBindingSet.id);
 
-			window.history.pushState(
-				undefined,
-				"",
-				"?" + searchParams.toString()
-			);
+			window.history.pushState(undefined, "", "?" + searchParams.toString());
 		});
 	}
 
@@ -29,9 +25,7 @@ export class UrlQueryController {
 
 		const mechanicalLayoutName = searchParams.get("mechanicalLayout");
 		if (mechanicalLayoutName) {
-			const l = this.model.mechanicalLayoutsProvider.findLayout(
-				mechanicalLayoutName
-			);
+			const l = this.model.mechanicalLayoutsProvider.findLayout(mechanicalLayoutName);
 			if (l) {
 				kbd.mechanicalLayout = l;
 			}
@@ -39,9 +33,7 @@ export class UrlQueryController {
 
 		const functionalLayoutName = searchParams.get("functionalLayout");
 		if (functionalLayoutName) {
-			const l = this.model.functionalLayoutsProvider.findLayout(
-				functionalLayoutName
-			);
+			const l = this.model.functionalLayoutsProvider.findLayout(functionalLayoutName);
 			if (l) {
 				kbd.setFunctionalLayout(l);
 			}
@@ -49,9 +41,7 @@ export class UrlQueryController {
 
 		const app = searchParams.get("app");
 		if (app) {
-			const curSet = this.model.keyBindingsProvider.findKeyBindingSet(
-				app
-			);
+			const curSet = this.model.keyBindingsProvider.findKeyBindingSet(app);
 			if (curSet) {
 				this.model.setCurrentKeyBindingSet(curSet);
 			}

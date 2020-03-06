@@ -41,6 +41,23 @@
 					"type": "boolean",
 					"default": true,
 					"description": "Pop out The Keyboard View with Chrome in Kiosk Mode."
+				},
+				"key-bindings-viewer.physicalLayout": {
+					"type": "string",
+					"default": "ANSI",
+					"enum": [
+						"ANSI",
+						"ISO"
+					]
+				},
+				"key-bindings-viewer.functionalLayout": {
+					"type": "string",
+					"default": "US",
+					"enum": [
+						"German",
+						"German - Neo 2",
+						"US"
+					]
 				}
 			}
 		}

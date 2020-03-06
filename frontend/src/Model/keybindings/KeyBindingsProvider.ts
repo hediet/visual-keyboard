@@ -50,7 +50,7 @@ function getVsCodeBindings(
 ): KeyBinding[] {
 	return bindings
 		.map(b => {
-			const key = b.key;
+			const key = b.key.toLowerCase();
 			const seq = key.split(" ");
 			const keys = seq.map(s => parseItem(s)!).filter(i => !!i);
 			const parts = b.command.split(".");
@@ -85,7 +85,7 @@ function parseItem(item: string): KeyWithModifiers | undefined {
 			shift = true;
 		} else if (part === "alt") {
 			alt = true;
-		} else if (part === "cmd") {
+		} else if (part === "cmd" || part === "win") {
 			meta = true;
 		} else {
 			main = VirtualKey.find(part.replace(/_/g, ""));

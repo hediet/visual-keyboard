@@ -13,7 +13,7 @@ import { Select } from "./Select";
 export class GUI extends React.Component<{ model: Model }, {}> {
 	render() {
 		const model = this.props.model;
-		const headless = true;
+		const headless = model.data.headless;
 		return (
 			<div className="component-GUI bp3-dark">
 				{!headless && (
@@ -61,33 +61,14 @@ export class GUI extends React.Component<{ model: Model }, {}> {
 								/>
 							</div>
 
-							{model.activeKeyBindingsPath.map((key, idx) => (
-								<div key={idx} className="part-Header-Item">
-									<Tag
-										children={key.toString()}
-										large={true}
-										intent={"primary"}
-										onRemove={() => model.resetCurrentKeyBindingPath()}
-									/>
-								</div>
-							))}
-
+							<Tags model={model} />
 							<div className="part-Header-Item" style={{ marginLeft: "auto" }}>
 								<Button intent={"primary"}>Get The VS Code Extension</Button>
 							</div>
 
 							<div className="part-Header-Item">
 								<AnchorButton
-									icon={
-										<svg
-											width={18}
-											height={18}
-											fill={"white"}
-											dangerouslySetInnerHTML={{
-												__html: githubSvg,
-											}}
-										/>
-									}
+									icon={<SVGImage src={githubSvg} />}
 									href="https://github.com/hediet/visual-keyboard"
 								>
 									Github
@@ -95,16 +76,7 @@ export class GUI extends React.Component<{ model: Model }, {}> {
 							</div>
 							<div className="part-Header-Item" style={{ padding: 0 }}>
 								<AnchorButton
-									icon={
-										<svg
-											width={18}
-											height={18}
-											fill={"white"}
-											dangerouslySetInnerHTML={{
-												__html: twitterSvg,
-											}}
-										/>
-									}
+									icon={<SVGImage src={twitterSvg} />}
 									href="https://twitter.com/intent/follow?screen_name=hediet_dev"
 								>
 									Twitter
@@ -117,15 +89,66 @@ export class GUI extends React.Component<{ model: Model }, {}> {
 						</div>
 					</>
 				)}
+
 				<div className="part-Keyboard" style={{ minHeight: 0 }}>
-					<AutoResize stretch={Stretch.Uniform} alignVertical="top">
-						<KeyboardComponent
-							model={this.props.model}
-							keyboard={this.props.model.keyboard}
-						/>
-					</AutoResize>
+					{this.props.model.initialized && (
+						<AutoResize stretch={Stretch.Uniform} alignVertical="top">
+							<KeyboardComponent
+								model={this.props.model}
+								keyboard={this.props.model.keyboard}
+							/>
+						</AutoResize>
+					)}
 				</div>
+				{headless && (
+					<div
+						style={{
+							position: "absolute",
+							top: 0,
+							right: 0,
+							margin: 10,
+						}}
+					>
+						<Tags
+							style={{ border: "1px solid white", borderRadius: "3px" }}
+							model={model}
+						/>
+					</div>
+				)}
 			</div>
+		);
+	}
+}
+
+function SVGImage(props: { src: string }) {
+	return (
+		<svg
+			width={18}
+			height={18}
+			fill={"white"}
+			dangerouslySetInnerHTML={{
+				__html: props.src,
+			}}
+		/>
+	);
+}
+
+@observer
+class Tags extends React.Component<{ model: Model; style?: React.CSSProperties }> {
+	render() {
+		return (
+			<>
+				{this.props.model.activeKeyBindingsPath.map((key, idx) => (
+					<div key={idx} className="part-Header-Item" style={{ ...this.props.style }}>
+						<Tag
+							children={key.toString()}
+							large={true}
+							intent={"primary"}
+							onRemove={() => this.props.model.resetCurrentKeyBindingPath()}
+						/>
+					</div>
+				))}
+			</>
 		);
 	}
 }
