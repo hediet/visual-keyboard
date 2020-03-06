@@ -8,7 +8,6 @@ import {
 	KeyFunction,
 } from "./FunctionalLayout";
 import { EventEmitter } from "@hediet/std/events";
-import { getScanCodeFromJsCode } from "../JsKeycodes";
 
 export class Keyboard {
 	@observable
