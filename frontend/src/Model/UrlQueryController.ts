@@ -10,7 +10,7 @@ export class UrlQueryController {
 
 			const searchParams = new URLSearchParams(window.location.search);
 
-			searchParams.set("mechanicalLayout", kbd.mechanicalLayout.name);
+			searchParams.set("physicalLayout", kbd.physicalLayout.name);
 			searchParams.set("functionalLayout", kbd.functionalLayout.name);
 			searchParams.set("app", model.currentKeyBindingSet.id);
 
@@ -23,11 +23,11 @@ export class UrlQueryController {
 
 		const searchParams = new URLSearchParams(window.location.search);
 
-		const mechanicalLayoutName = searchParams.get("mechanicalLayout");
-		if (mechanicalLayoutName) {
-			const l = this.model.mechanicalLayoutsProvider.findLayout(mechanicalLayoutName);
+		const physicalLayoutName = searchParams.get("physicalLayout");
+		if (physicalLayoutName) {
+			const l = this.model.physicalLayoutsProvider.findLayout(physicalLayoutName);
 			if (l) {
-				kbd.mechanicalLayout = l;
+				kbd.physicalLayout = l;
 			}
 		}
 

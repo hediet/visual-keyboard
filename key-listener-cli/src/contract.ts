@@ -10,7 +10,7 @@ export const keyboardContract = contract({
 		}),
 		updateSettings: notificationContract({
 			params: types.type({
-				mechanicalLayout: types.union([types.string, types.null]),
+				physicalLayout: types.union([types.string, types.null]),
 				functionalLayout: types.union([types.string, types.null]),
 				keyBindingSet: types.union([types.string, types.null]),
 			}),

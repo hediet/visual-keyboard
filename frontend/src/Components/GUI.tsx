@@ -3,7 +3,7 @@ import { observer } from "mobx-react";
 import * as React from "react";
 import { svg as githubSvg } from "simple-icons/icons/github";
 import { svg as twitterSvg } from "simple-icons/icons/twitter";
-import { FunctionalLayout, MechanicalLayout, Model } from "../Model";
+import { FunctionalLayout, PhysicalLayout, Model } from "../Model";
 import { KeyBindingSet } from "../Model/keybindings/KeyBindingsProvider";
 import { AutoResize, Stretch } from "./AutoResize";
 import { KeyboardComponent } from "./KeyboardComponent";
@@ -25,11 +25,11 @@ export class GUI extends React.Component<{ model: Model }, {}> {
 							}}
 						>
 							<div className="part-Header-Item">
-								<Select<MechanicalLayout>
-									value={model.keyboard.mechanicalLayout}
-									values={model.mechanicalLayoutsProvider.getLayouts()}
+								<Select<PhysicalLayout>
+									value={model.keyboard.physicalLayout}
+									values={model.physicalLayoutsProvider.getLayouts()}
 									getLabel={v => `${v.name} Keyboard`}
-									onChange={e => (model.keyboard.mechanicalLayout = e)}
+									onChange={e => (model.keyboard.physicalLayout = e)}
 								/>
 							</div>
 							<div className="part-Header-Item">

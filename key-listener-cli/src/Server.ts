@@ -10,7 +10,7 @@ export class Server {
 	public readonly port: number;
 
 	constructor(options: { port?: number; handleClient?: (client: Client) => void } = {}) {
-		const clients = new Set<Client>();
+		const authenticatedClients = new Set<Client>();
 
 		const server = startWebSocketServer(
 			{
@@ -21,25 +21,32 @@ export class Server {
 					stream,
 					new ConsoleRpcLogger(),
 					{
-						authenticate: async ({ secret }) => {},
+						authenticate: async ({ secret }) => {
+							if (secret !== this.secret) {
+								throw new Error("Invalid secret!");
+							}
+							if (!c.authenticated) {
+								c.authenticated = true;
+								authenticatedClients.add(c);
+								if (options.handleClient) {
+									options.handleClient(c);
+								}
+							}
+						},
 					}
 				);
 
 				const c = new Client(client);
-				clients.add(c);
-				if (options.handleClient) {
-					options.handleClient(c);
-				}
+
 				await stream.onClosed;
-				clients.delete(c);
+				authenticatedClients.delete(c);
 			}
 		);
 		this.port = server.port;
 
 		const keyboardHook = new KeyboardHook();
-
 		keyboardHook.onKeyAction.sub(({ action, physicalKey, keycode }) => {
-			for (const c of clients) {
+			for (const c of authenticatedClients) {
 				c.connection.onKeyEvent({
 					action,
 					physicalKey,
@@ -50,5 +57,7 @@ export class Server {
 }
 
 export class Client {
+	public authenticated = false;
+
 	constructor(public readonly connection: typeof keyboardContract.TClientInterface) {}
 }

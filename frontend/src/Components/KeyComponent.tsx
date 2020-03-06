@@ -1,6 +1,6 @@
 import { observer } from "mobx-react";
 import React = require("react");
-import { Model, Keyboard, MechanicalKeyDef } from "../Model";
+import { Model, Keyboard, PhysicalKeyDef } from "../Model";
 import classNames = require("classnames");
 import { AutoResize, Stretch } from "./AutoResize";
 
@@ -8,7 +8,7 @@ import { AutoResize, Stretch } from "./AutoResize";
 export class KeyComponent extends React.Component<{
 	model: Model;
 	keyboard: Keyboard;
-	keyDef: MechanicalKeyDef;
+	keyDef: PhysicalKeyDef;
 }> {
 	render() {
 		const { keyDef, keyboard, model } = this.props;

@@ -1,5 +1,5 @@
 import { observer } from "mobx-react";
-import { Keyboard, Model, MechanicalKeyDef } from "../Model";
+import { Keyboard, Model, PhysicalKeyDef } from "../Model";
 import React = require("react");
 import { KeyComponent } from "./KeyComponent";
 
@@ -7,10 +7,10 @@ import { KeyComponent } from "./KeyComponent";
 export class KeyboardComponent extends React.Component<{ keyboard: Keyboard; model: Model }, {}> {
 	render() {
 		const kbd = this.props.keyboard;
-		const l = kbd.mechanicalLayout;
+		const l = kbd.physicalLayout;
 		const f = kbd.functionalLayout;
 
-		function getTag(key: MechanicalKeyDef): string {
+		function getTag(key: PhysicalKeyDef): string {
 			const fn = f.defaultState.getFunction(key.physicalKey);
 			if (fn) {
 				if (fn.virtualKey) {
@@ -21,7 +21,7 @@ export class KeyboardComponent extends React.Component<{ keyboard: Keyboard; mod
 		}
 
 		const set = new Set<string>();
-		function getId(key: MechanicalKeyDef): string {
+		function getId(key: PhysicalKeyDef): string {
 			const tag = getTag(key);
 			let i = 0;
 			while (true) {

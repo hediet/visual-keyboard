@@ -5,10 +5,10 @@ import {
 	PhysicalKey,
 	VirtualKey,
 	FunctionalLayoutsProvider,
-	MechanicalKeyDef,
+	PhysicalKeyDef,
 } from "./Keyboard";
 import { KeyBindingTrie, Modifiers, KeyWithModifiers, KeyBindingsResult } from "./keybindings";
-import { MechanicalLayoutsProvider } from "./Keyboard/MechanicalLayoutsProvider";
+import { PhysicalLayoutsProvider } from "./Keyboard/PhysicalLayoutsProvider";
 import { UrlQueryController } from "./UrlQueryController";
 import { KeyBindingsProvider, KeyBindingSet } from "./keybindings/KeyBindingsProvider";
 import { WebSocketStream } from "@hediet/typed-json-rpc-websocket";
@@ -16,11 +16,11 @@ import { ConsoleRpcLogger } from "@hediet/typed-json-rpc";
 import { keyboardContract } from "@hediet/key-listener/dist/contract";
 
 export class Model {
-	public readonly mechanicalLayoutsProvider = new MechanicalLayoutsProvider();
+	public readonly physicalLayoutsProvider = new PhysicalLayoutsProvider();
 	public readonly functionalLayoutsProvider = new FunctionalLayoutsProvider();
 
 	public readonly keyboard = new Keyboard(
-		this.mechanicalLayoutsProvider.defaultLayout,
+		this.physicalLayoutsProvider.defaultLayout,
 		this.functionalLayoutsProvider.defaultLayout
 	);
 
@@ -122,7 +122,7 @@ export class Model {
 	@observable idx = -1;
 
 	@computed get keysSorted() {
-		return this.keyboard.mechanicalLayout.keysSortedByPosition;
+		return this.keyboard.physicalLayout.keysSortedByPosition;
 	}
 
 	get activeKey(): PhysicalKey | undefined {
@@ -172,7 +172,7 @@ export class Model {
 						},
 						updateSettings: async ({
 							functionalLayout,
-							mechanicalLayout,
+							physicalLayout,
 							keyBindingSet,
 						}) => {
 							if (functionalLayout) {
@@ -184,12 +184,10 @@ export class Model {
 								}
 							}
 
-							if (mechanicalLayout) {
-								const l = this.mechanicalLayoutsProvider.findLayout(
-									mechanicalLayout
-								);
+							if (physicalLayout) {
+								const l = this.physicalLayoutsProvider.findLayout(physicalLayout);
 								if (l) {
-									this.keyboard.mechanicalLayout = l;
+									this.keyboard.physicalLayout = l;
 								}
 							}
 							this.initialized = true;

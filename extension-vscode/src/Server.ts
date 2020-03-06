@@ -28,7 +28,7 @@ export class Server {
 				// FIXME dispose autorun
 				autorun(() => {
 					client.connection.updateSettings({
-						mechanicalLayout: config.physicalLayout,
+						physicalLayout: config.physicalLayout,
 						functionalLayout: config.functionalLayout,
 						keyBindingSet: null,
 					});

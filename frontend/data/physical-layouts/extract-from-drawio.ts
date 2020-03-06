@@ -1,7 +1,5 @@
 import { readFileSync, writeFileSync } from "fs";
-import { MechanicalLayoutData } from "../../src/model/Keyboard";
-import { ScanCode } from "../../src/model/Keyboard/primitives";
-import { getJsCodeFromScanCode } from "../../src/model/JsKeycodes";
+import { PhysicalLayoutData } from "../../src/model/Keyboard";
 
 const r = /value="(.*?)".*?\n.*x="(.*?)" y="(.*?)" width="(.*?)" height="(.*?)"/g;
 const str = readFileSync("./ansi.drawio.xml", { encoding: "utf8" });
@@ -54,7 +52,7 @@ while (true) {
 
 const keyboard = extractionResults.find(r => r.value === "keyboard")!;
 
-const keyboardDef: MechanicalLayoutData = {
+const keyboardDef: PhysicalLayoutData = {
 	name: "test",
 	width: keyboard.width,
 	height: keyboard.height,
@@ -66,7 +64,7 @@ for (const r of extractionResults) {
 		continue;
 	}
 	keyboardDef.keys.push({
-		scanCode: r.value,
+		physicalKey: r.value,
 		x: r.x - keyboard.x,
 		y: r.y - keyboard.y,
 		width: r.width,

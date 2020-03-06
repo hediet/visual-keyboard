@@ -1,17 +1,12 @@
 import { observable, action, computed } from "mobx";
 import { PhysicalKey, VirtualKey } from "./primitives";
-import { MechanicalLayout } from "./MechanicalLayout";
-import {
-	FunctionalLayout,
-	FunctionalLayoutState,
-	FunctionalLayoutImpl,
-	KeyFunction,
-} from "./FunctionalLayout";
+import { PhysicalLayout } from "./PhysicalLayout";
+import { FunctionalLayout, FunctionalLayoutState, KeyFunction } from "./FunctionalLayout";
 import { EventEmitter } from "@hediet/std/events";
 
 export class Keyboard {
 	@observable
-	public mechanicalLayout: MechanicalLayout;
+	public physicalLayout: PhysicalLayout;
 
 	@observable
 	private _functionalLayout!: FunctionalLayout;
@@ -50,8 +45,8 @@ export class Keyboard {
 	}>();
 	public readonly onKeyPressed = this._onKeyPressed.asEvent();
 
-	constructor(mechanicalLayout: MechanicalLayout, functionalLayout: FunctionalLayout) {
-		this.mechanicalLayout = mechanicalLayout;
+	constructor(physicalLayout: PhysicalLayout, functionalLayout: FunctionalLayout) {
+		this.physicalLayout = physicalLayout;
 		this.setFunctionalLayout(functionalLayout);
 	}
 
