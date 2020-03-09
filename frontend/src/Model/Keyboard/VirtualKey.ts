@@ -79,7 +79,7 @@ export const KnownVirtualKeys = {
 		id: "MetaL",
 		icon: "⌘",
 		simpleName: "Super",
-		alternativeIds: ["win"],
+		alternativeIds: ["win", "super", "meta"],
 	}),
 	MetaR: VirtualKey.register({ id: "MetaR", icon: "⌘", simpleName: "Super" }),
 	Apps: VirtualKey.register({ id: "Apps" }),

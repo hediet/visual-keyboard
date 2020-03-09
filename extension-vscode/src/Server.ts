@@ -25,6 +25,19 @@ export class Server {
 	}
 
 	constructor(config: Config) {
+		const keyBindingSetPerPlatform: Record<typeof process["platform"], string | null> = {
+			aix: "VS Code-linux",
+			android: "VS Code-linux",
+			darwin: "VS Code-mac",
+			freebsd: "VS Code-linux",
+			linux: "VS Code-linux",
+			openbsd: "VS Code-linux",
+			sunos: "VS Code-linux",
+			win32: "VS Code-win",
+			cygwin: "VS Code-linux",
+			netbsd: "VS Code-linux",
+		};
+
 		this.wsServer = new WebsocketServer({
 			handleClient: client => {
 				client.disposer.track({
@@ -32,7 +45,7 @@ export class Server {
 						client.connection.updateSettings({
 							physicalLayout: config.physicalLayout,
 							functionalLayout: config.functionalLayout,
-							keyBindingSet: null,
+							keyBindingSet: keyBindingSetPerPlatform[process.platform],
 						});
 					}),
 				});

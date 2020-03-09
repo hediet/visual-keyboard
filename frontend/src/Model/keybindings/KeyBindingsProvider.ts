@@ -92,7 +92,12 @@ function parseItem(item: string): KeyWithModifiers | undefined {
 		} else {
 			main = VirtualKey.find(part.replace(/_/g, ""));
 
-			//UsQwertyLayout.
+			if (!main) {
+				const r = UsQwertyLayout.defaultState.findFunction(p => p.text === part);
+				if (r) {
+					main = r.function.virtualKey;
+				}
+			}
 
 			if (!main) {
 				console.warn(`Virtual Key "${part}" in "${item}" not found.`);

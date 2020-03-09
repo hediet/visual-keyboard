@@ -9,8 +9,9 @@ export abstract class FunctionalLayout {
 
 export abstract class FunctionalLayoutState {
 	public abstract getFunction(scanCode: PhysicalKey): KeyFunction | undefined;
-	public abstract findScanCodeForFunction(fn: FunctionSymbol): PhysicalKey | undefined;
-	//public abstract findScanCodeFor
+	public abstract findFunction(
+		pred: (f: KeyFunction) => boolean
+	): { key: PhysicalKey; function: KeyFunction } | undefined;
 }
 
 export interface KeyFunction {
@@ -115,12 +116,14 @@ class BaseFunctionalLayoutStateImpl extends FunctionalLayoutState {
 		return f;
 	}
 
-	public findScanCodeForFunction(fn: FunctionSymbol): PhysicalKey | undefined {
-		const f = [...this.functions.entries()].find(v => v[1].functionSymbol === fn);
+	public findFunction(
+		pred: (f: KeyFunction) => boolean
+	): { key: PhysicalKey; function: KeyFunction } | undefined {
+		const f = [...this.functions.entries()].find(v => pred(v[1]));
 		if (!f) {
 			return undefined;
 		}
-		return f[0];
+		return { key: f[0], function: f[1] };
 	}
 }
 
@@ -154,7 +157,9 @@ class FunctionalLayoutStateImpl extends FunctionalLayoutState {
 		return f;
 	}
 
-	public findScanCodeForFunction(fn: FunctionSymbol): PhysicalKey | undefined {
-		return this.base.findScanCodeForFunction(fn);
+	public findFunction(
+		pred: (f: KeyFunction) => boolean
+	): { key: PhysicalKey; function: KeyFunction } | undefined {
+		return this.base.findFunction(pred);
 	}
 }

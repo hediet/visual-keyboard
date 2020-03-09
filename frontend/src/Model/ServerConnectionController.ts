@@ -85,6 +85,15 @@ export class ServerConnectionController {
 									this.model.keyboard.physicalLayout = l;
 								}
 							}
+							if (keyBindingSet) {
+								const l = this.model.keyBindingsProvider.findKeyBindingSet(
+									keyBindingSet
+								);
+								if (l) {
+									this.model.setCurrentKeyBindingSet(l);
+								}
+							}
+
 							this.model.initialized = true;
 						},
 					}
