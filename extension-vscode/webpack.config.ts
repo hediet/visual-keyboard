@@ -18,9 +18,8 @@ module.exports = {
 	devtool: "source-map",
 	externals: {
 		vscode: "commonjs vscode",
-		"@hediet/debug-visualizer-data-extraction":
-			"@hediet/debug-visualizer-data-extraction",
-		"debug-visualizer-webview": "debug-visualizer-webview",
+		"@hediet/visual-keyboard-frontend": "@hediet/visual-keyboard-frontend",
+		iohook: "iohook",
 	},
 	resolve: {
 		extensions: [".ts", ".js"],
@@ -43,20 +42,24 @@ module.exports = {
 	},
 	plugins: [
 		new CleanWebpackPlugin(),
-		includeDependency(r("../data-extraction/")),
-		includeDependency(r("../webview/")),
+		includeDependency("../frontend"),
+		includeDependency("iohook"),
 	],
 } as webpack.Configuration;
 
-function includeDependency(location: string) {
-	const content = readFileSync(path.join(location, "package.json"), {
+function includeDependency(pkg: string) {
+	const pkgJson = path.join(pkg, "package.json");
+	const pkgJsonPath = require.resolve(pkgJson);
+	const pkgPath = path.join(pkgJsonPath, "../");
+
+	const content = readFileSync(pkgJsonPath, {
 		encoding: "utf8",
 	});
 	const pkgName = JSON.parse(content).name;
 
 	return new CopyPlugin([
 		{
-			from: location,
+			from: pkgPath,
 			to: r(`./dist/node_modules/${pkgName}`),
 			ignore: ["**/node_modules/**/*"],
 		},
