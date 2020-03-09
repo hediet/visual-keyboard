@@ -6,7 +6,7 @@ import cryptoRandomString = require("crypto-random-string");
 import { Disposer } from "@hediet/std/disposable";
 
 export class Server {
-	public readonly secret = cryptoRandomString({ length: 20 });
+	public readonly serverSecret = cryptoRandomString({ length: 20 });
 
 	public readonly port: number;
 
@@ -31,19 +31,18 @@ export class Server {
 					new ConsoleRpcLogger(),
 					{
 						authenticate: async ({ secret }) => {
-							if (secret !== this.secret) {
-								throw new Error("Invalid secret!");
-							} else {
-								if (!c.authenticated) {
-									c.authenticated = true;
-									authenticatedClients.add(c);
-									if (options.handleClient) {
-										options.handleClient(c);
-									}
-								}
+							c.ensureUnauthenticated();
+							c.authenticateOrThrow(secret);
+
+							authenticatedClients.add(c);
+
+							if (options.handleClient) {
+								options.handleClient(c);
 							}
 						},
 						executeAction: async ({ action }) => {
+							c.ensureAuthenticated();
+
 							if (options.handleAction) {
 								options.handleAction(action);
 							}
@@ -51,7 +50,7 @@ export class Server {
 					}
 				);
 
-				const c = new Client(client);
+				const c = new Client(client, this.serverSecret);
 
 				await stream.onClosed;
 				authenticatedClients.delete(c);
@@ -75,7 +74,10 @@ export class Server {
 }
 
 export class Client {
-	public authenticated = false;
+	private _authenticated = false;
+	public get authenticated() {
+		return this._authenticated;
+	}
 
 	public readonly disposer = new Disposer();
 
@@ -86,5 +88,27 @@ export class Client {
 		return this._connection;
 	}
 
-	constructor(private readonly _connection: typeof keyboardContract.TClientInterface) {}
+	constructor(
+		private readonly _connection: typeof keyboardContract.TClientInterface,
+		private readonly serverSecret: string
+	) {}
+
+	public authenticateOrThrow(secret: string): void {
+		if (secret !== this.serverSecret) {
+			throw new Error("Invalid secret!");
+		}
+		this._authenticated = true;
+	}
+
+	public ensureUnauthenticated(): void {
+		if (this.authenticated) {
+			throw new Error("Already authenticated!");
+		}
+	}
+
+	public ensureAuthenticated(): void {
+		if (!this.authenticated) {
+			throw new Error("Not authenticated!");
+		}
+	}
 }
