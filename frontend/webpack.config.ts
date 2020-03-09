@@ -11,7 +11,7 @@ module.exports = {
 	entry: [r("src/index.tsx")],
 	output: {
 		path: r("dist"),
-		filename: "[name]-[hash].js",
+		filename: "[name].js",
 		chunkFilename: "[name]-[hash].js",
 	},
 	resolve: {
