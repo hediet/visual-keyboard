@@ -74,6 +74,7 @@ export function getHtml(server: Server) {
 					window.webViewData = ${JSON.stringify({
 						serverSecret: server.secret,
 						serverPort: server.wsPort,
+						headless: true,
 					})};
 				</script>
 				${
