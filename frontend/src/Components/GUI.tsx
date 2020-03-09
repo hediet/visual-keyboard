@@ -13,7 +13,7 @@ import { Select } from "./Select";
 export class GUI extends React.Component<{ model: Model }, {}> {
 	render() {
 		const model = this.props.model;
-		const headless = model.data.headless;
+		const headless = model.config.headless;
 		return (
 			<div className="component-GUI bp3-dark">
 				{!headless && (

@@ -41,21 +41,13 @@ export class KeyComponent extends React.Component<{
 				text = keyFn.text;
 			}
 		}
-		//text = keyDef.scanCode.code.toString();
-		/*if (defaultFn && defaultFn.virtualKey) {
-			text = defaultFn.virtualKey.name;
-		}
-		action = getJsCodeFromScanCode(keyDef.scanCode)!;
-		*/
-		//action = `${virtualKey}, ${keyDef.scanCode.code}`;
-		//action = keyDef.scanCode.toString();
-		//text = getJsCodeFromScanCode(keyDef.scanCode);
+
 		return (
 			<button
 				className={classNames(
 					"component-Key",
 					keyboard.isKeyPressed(keyDef.physicalKey) && "pressed",
-					model.activeKey === keyDef.physicalKey && "active",
+					// model.activeKey === keyDef.physicalKey && "active",
 					virtualKey && `virtualKey-${virtualKey}`
 				)}
 				onClick={() => keyboard.handleButtonToggle(keyDef.physicalKey)}

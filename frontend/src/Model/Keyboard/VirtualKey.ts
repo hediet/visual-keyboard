@@ -4,6 +4,7 @@ export class VirtualKey {
 	public static register(options: {
 		id: string;
 		simpleName?: string;
+		icon?: string;
 		alternativeIds?: string[];
 	}): VirtualKey {
 		const id = options.id.toLowerCase();
@@ -11,7 +12,7 @@ export class VirtualKey {
 		if (existing) {
 			throw new Error(`Key with id "${existing.id}" already exists.`);
 		}
-		const key = new VirtualKey(options.id, options.simpleName);
+		const key = new VirtualKey(options.id, options.simpleName, options.icon);
 		this.instances.set(id, key);
 		if (options.alternativeIds) {
 			for (const a of options.alternativeIds) {
@@ -38,10 +39,14 @@ export class VirtualKey {
 
 	private constructor(
 		public readonly id: string,
-		public readonly simpleName?: string
+		public readonly simpleName?: string,
+		public readonly icon?: string
 	) {}
 
 	format(): string {
+		if (this.icon) {
+			return this.icon;
+		}
 		if (this.simpleName) {
 			return this.simpleName;
 		}
@@ -50,8 +55,8 @@ export class VirtualKey {
 }
 
 export const KnownVirtualKeys = {
-	ShiftR: VirtualKey.register({ id: "ShiftR", simpleName: "Shift" }),
-	ShiftL: VirtualKey.register({ id: "ShiftL", simpleName: "Shift" }),
+	ShiftR: VirtualKey.register({ id: "ShiftR", simpleName: "Shift", icon: "⇧" }),
+	ShiftL: VirtualKey.register({ id: "ShiftL", simpleName: "Shift", icon: "⇧" }),
 	F1: VirtualKey.register({ id: "F1" }),
 	F2: VirtualKey.register({ id: "F2" }),
 	F3: VirtualKey.register({ id: "F3" }),
@@ -67,29 +72,30 @@ export const KnownVirtualKeys = {
 	Escape: VirtualKey.register({ id: "Escape" }),
 	CtrlL: VirtualKey.register({ id: "CtrlL", simpleName: "Ctrl" }),
 	CtrlR: VirtualKey.register({ id: "CtrlR", simpleName: "Ctrl" }),
-	Return: VirtualKey.register({ id: "Return", alternativeIds: ["Enter"] }),
-	Tab: VirtualKey.register({ id: "Tab" }),
-	BackSpace: VirtualKey.register({ id: "Backspace" }),
+	Return: VirtualKey.register({ id: "Return", icon: "↵", alternativeIds: ["Enter"] }),
+	Tab: VirtualKey.register({ id: "Tab", icon: "⭾" }),
+	BackSpace: VirtualKey.register({ id: "Backspace", icon: "Backspace ⌫" }),
 	MetaL: VirtualKey.register({
 		id: "MetaL",
-		simpleName: "Meta",
+		icon: "⌘",
+		simpleName: "Super",
 		alternativeIds: ["win"],
 	}),
-	MetaR: VirtualKey.register({ id: "MetaR", simpleName: "Meta" }),
+	MetaR: VirtualKey.register({ id: "MetaR", icon: "⌘", simpleName: "Super" }),
 	Apps: VirtualKey.register({ id: "Apps" }),
 	Caps: VirtualKey.register({ id: "Caps" }),
 	AltL: VirtualKey.register({ id: "AltL", simpleName: "Alt" }),
 	AltR: VirtualKey.register({ id: "AltR", simpleName: "Alt Gr" }),
-	Up: VirtualKey.register({ id: "Up" }),
-	Left: VirtualKey.register({ id: "Left" }),
-	Down: VirtualKey.register({ id: "Down" }),
-	Right: VirtualKey.register({ id: "Right" }),
+	Up: VirtualKey.register({ id: "Up", icon: "↑" }),
+	Left: VirtualKey.register({ id: "Left", icon: "←" }),
+	Down: VirtualKey.register({ id: "Down", icon: "↓ " }),
+	Right: VirtualKey.register({ id: "Right", icon: "→" }),
 	Insert: VirtualKey.register({ id: "Insert" }),
-	Home: VirtualKey.register({ id: "Home" }),
-	End: VirtualKey.register({ id: "End" }),
-	Prior: VirtualKey.register({ id: "Prior", alternativeIds: ["PageUp"] }),
-	Next: VirtualKey.register({ id: "Next", alternativeIds: ["PageDown"] }),
-	Delete: VirtualKey.register({ id: "Delete" }),
+	Home: VirtualKey.register({ id: "Home", icon: "Home ⤒" }),
+	End: VirtualKey.register({ id: "End", icon: "End ⤓" }),
+	Prior: VirtualKey.register({ id: "Prior", icon: "Prior ⇞", alternativeIds: ["PageUp"] }),
+	Next: VirtualKey.register({ id: "Next", icon: "Next ⇟", alternativeIds: ["PageDown"] }),
+	Delete: VirtualKey.register({ id: "Delete", icon: "Del ⌦" }),
 	Pause: VirtualKey.register({ id: "Pause" }),
 
 	Key1: VirtualKey.register({ id: "1" }),

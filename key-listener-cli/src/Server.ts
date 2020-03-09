@@ -3,13 +3,22 @@ import { keyboardContract } from "./contract";
 import { ConsoleRpcLogger } from "@hediet/typed-json-rpc";
 import { KeyboardHook } from "./KeyboardHook";
 import cryptoRandomString = require("crypto-random-string");
+import { Disposer } from "@hediet/std/disposable";
 
 export class Server {
 	public readonly secret = cryptoRandomString({ length: 20 });
 
 	public readonly port: number;
 
-	constructor(options: { port?: number; handleClient?: (client: Client) => void } = {}) {
+	public enableKeyboardHook = true;
+
+	constructor(
+		options: {
+			port?: number;
+			handleClient?: (client: Client) => void;
+			handleAction?: (action: string) => void;
+		} = {}
+	) {
 		const authenticatedClients = new Set<Client>();
 
 		const server = startWebSocketServer(
@@ -24,13 +33,19 @@ export class Server {
 						authenticate: async ({ secret }) => {
 							if (secret !== this.secret) {
 								throw new Error("Invalid secret!");
-							}
-							if (!c.authenticated) {
-								c.authenticated = true;
-								authenticatedClients.add(c);
-								if (options.handleClient) {
-									options.handleClient(c);
+							} else {
+								if (!c.authenticated) {
+									c.authenticated = true;
+									authenticatedClients.add(c);
+									if (options.handleClient) {
+										options.handleClient(c);
+									}
 								}
+							}
+						},
+						executeAction: async ({ action }) => {
+							if (options.handleAction) {
+								options.handleAction(action);
 							}
 						},
 					}
@@ -40,17 +55,20 @@ export class Server {
 
 				await stream.onClosed;
 				authenticatedClients.delete(c);
+				c.disposer.dispose();
 			}
 		);
 		this.port = server.port;
 
 		const keyboardHook = new KeyboardHook();
 		keyboardHook.onKeyAction.sub(({ action, physicalKey, keycode }) => {
-			for (const c of authenticatedClients) {
-				c.connection.onKeyEvent({
-					action,
-					physicalKey,
-				});
+			if (this.enableKeyboardHook) {
+				for (const c of authenticatedClients) {
+					c.connection.onKeyEvent({
+						action,
+						physicalKey,
+					});
+				}
 			}
 		});
 	}
@@ -59,5 +77,14 @@ export class Server {
 export class Client {
 	public authenticated = false;
 
-	constructor(public readonly connection: typeof keyboardContract.TClientInterface) {}
+	public readonly disposer = new Disposer();
+
+	public get connection(): typeof keyboardContract.TClientInterface {
+		if (!this.authenticated) {
+			throw new Error("Cliet is not authenticated!");
+		}
+		return this._connection;
+	}
+
+	constructor(private readonly _connection: typeof keyboardContract.TClientInterface) {}
 }

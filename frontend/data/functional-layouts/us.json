@@ -26,7 +26,7 @@
 				"Tab": { "virtualKey": "Tab" },
 				"Backspace": { "virtualKey": "Backspace" },
 				"MetaLeft": { "virtualKey": "MetaL" },
-				"AltRight": { "virtualKey": "MetaR" },
+				"AltRight": { "virtualKey": "AltR" },
 				"undefined": { "virtualKey": "AltR" },
 				"CapsLock": { "virtualKey": "Caps" },
 				"ArrowUp": { "virtualKey": "Up" },

@@ -4,7 +4,7 @@
 		"default": {
 			"mapping": {
 				"AltLeft": { "virtualKey": "AltL" },
-				"AltRight": { "virtualKey": "MetaR" },
+				"AltRight": { "virtualKey": "AltR" },
 				"ArrowDown": { "virtualKey": "Down" },
 				"ArrowLeft": { "virtualKey": "Left" },
 				"ArrowRight": { "virtualKey": "Right" },
@@ -53,8 +53,7 @@
 				"PageUp": { "virtualKey": "Prior" },
 				"ShiftLeft": { "virtualKey": "ShiftL" },
 				"ShiftRight": { "virtualKey": "ShiftR" },
-				"Tab": { "virtualKey": "Tab" },
-				"undefined": { "virtualKey": "AltR" }
+				"Tab": { "virtualKey": "Tab" }
 			}
 		},
 		"neo-default": {

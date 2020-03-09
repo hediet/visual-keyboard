@@ -29,6 +29,10 @@ export class KeyboardHook {
 			.subscribe(v => this.keyAction.emit(v));
 	}
 
+	public dispose(): void {
+		iohook.stop();
+	}
+
 	private readonly subject = new Subject<{
 		action: "pressed" | "released";
 		physicalKey: string;

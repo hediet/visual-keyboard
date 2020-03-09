@@ -1,4 +1,4 @@
-import { window, ExtensionContext, commands } from "vscode";
+import { window, ExtensionContext, commands, Uri } from "vscode";
 import { Disposable } from "@hediet/std/disposable";
 import {
 	enableHotReload,
@@ -15,6 +15,7 @@ registerUpdateReconciler(module);
 import { WebViews } from "./WebViews";
 import { Server } from "./Server";
 import { Config } from "./Config";
+import { openBrowserView } from "./openBrowserView";
 
 export class Extension {
 	public readonly dispose = Disposable.fn();
@@ -31,11 +32,14 @@ export class Extension {
 			i.show();
 		}
 
-		this.dispose.track(
+		this.dispose.track([
 			commands.registerCommand("key-bindings-viewer.open-view", () => {
 				this.views.createNew();
-			})
-		);
+			}),
+			commands.registerCommand("key-bindings-viewer.open-external-view", () => {
+				openBrowserView(this.server, this.config);
+			}),
+		]);
 	}
 }
 

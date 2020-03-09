@@ -31,16 +31,20 @@
 		"commands": [
 			{
 				"command": "key-bindings-viewer.open-view",
-				"title": "Open a keyboard view"
+				"title": "Open Keyboard View"
+			},
+			{
+				"command": "key-bindings-viewer.open-external-view",
+				"title": "Open Keyboard View In Browser"
 			}
 		],
 		"configuration": {
-			"title": "Keybindings Viewer",
+			"title": "Key Bindings Viewer",
 			"properties": {
 				"key-bindings-viewer.useChromeKioskMode": {
 					"type": "boolean",
 					"default": true,
-					"description": "Pop out The Keyboard View with Chrome in Kiosk Mode."
+					"description": "Open The Keyboard View with Chrome in Kiosk Mode."
 				},
 				"key-bindings-viewer.physicalLayout": {
 					"type": "string",

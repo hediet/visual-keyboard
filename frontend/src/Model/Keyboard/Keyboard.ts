@@ -21,7 +21,7 @@ export class Keyboard {
 		const s = [...this.pressedKeys.values()];
 		this.reset();
 		for (const k of s) {
-			this.handleKeyPress(k);
+			this.handleKeyPress(k, "key");
 		}
 	}
 
@@ -40,6 +40,7 @@ export class Keyboard {
 	public readonly pressedVirtualKeys = new Set<VirtualKey>();
 
 	private readonly _onKeyPressed = new EventEmitter<{
+		mode: "button" | "key";
 		key: PhysicalKey;
 		keyFunction: KeyFunction;
 	}>();
@@ -58,7 +59,7 @@ export class Keyboard {
 	}
 
 	@action
-	public handleKeyPress(key: PhysicalKey): void {
+	public handleKeyPress(key: PhysicalKey, mode: "button" | "key"): void {
 		if (this._pressedKeys.has(key)) {
 			return;
 		}
@@ -70,10 +71,6 @@ export class Keyboard {
 		});
 
 		const f = this.currentFunctionalLayoutState.getFunction(key);
-		this._onKeyPressed.emit({
-			key: key,
-			keyFunction: f || {},
-		});
 
 		if (f && f.virtualKey) {
 			this.pressedVirtualKeys.add(f.virtualKey);
@@ -82,10 +79,16 @@ export class Keyboard {
 		if (f && f.stateAfterKeyPressed) {
 			this.currentFunctionalLayoutState = f.stateAfterKeyPressed;
 		}
+
+		this._onKeyPressed.emit({
+			key: key,
+			keyFunction: f || {},
+			mode,
+		});
 	}
 
 	@action
-	public handleKeyRelease(key: PhysicalKey): void {
+	public handleKeyRelease(key: PhysicalKey, mode: "button" | "key"): void {
 		const fn = this._pressedKeys.get(key);
 		if (!fn) {
 			return;
@@ -103,9 +106,9 @@ export class Keyboard {
 	@action
 	public handleButtonToggle(key: PhysicalKey): void {
 		if (this._pressedKeys.has(key)) {
-			this.handleKeyRelease(key);
+			this.handleKeyRelease(key, "button");
 		} else {
-			this.handleKeyPress(key);
+			this.handleKeyPress(key, "button");
 		}
 	}
 

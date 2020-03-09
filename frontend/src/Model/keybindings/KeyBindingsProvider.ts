@@ -1,12 +1,14 @@
 import { KeyBinding, Action, KeyWithModifiers, Modifiers } from ".";
 import { bindings as winBindings } from "./vscode-data/win";
 import { bindings as macBindings } from "./vscode-data/mac";
+import { bindings as linuxBindings } from "./vscode-data/linux";
 import { VirtualKey, UsQwertyLayout } from "..";
 
 export class KeyBindingsProvider {
 	private readonly keyBindingSets = [
 		new KeyBindingSet("VS Code", "win", getVsCodeBindings(winBindings)),
 		new KeyBindingSet("VS Code", "mac", getVsCodeBindings(macBindings)),
+		new KeyBindingSet("VS Code", "linux", getVsCodeBindings(linuxBindings)),
 	];
 
 	getKeyBindingSets(): KeyBindingSet[] {

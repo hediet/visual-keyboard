@@ -27,5 +27,10 @@ export const keyboardContract = contract({
 				secret: types.string,
 			}),
 		}),
+		executeAction: requestContract({
+			params: types.type({
+				action: types.string,
+			}),
+		}),
 	},
 });

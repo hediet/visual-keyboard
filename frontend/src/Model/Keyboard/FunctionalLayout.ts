@@ -35,6 +35,7 @@ export interface FunctionalLayoutModeData {
 export class FunctionalLayoutImpl extends FunctionalLayout {
 	constructor(data: FunctionalLayoutData) {
 		const modes = new Map<string, BaseFunctionalLayoutStateImpl>();
+		const modifierKeys = new Set<PhysicalKey>();
 		function lookupState(name: string): BaseFunctionalLayoutStateImpl {
 			let v = modes.get(name);
 			if (!v) {
@@ -45,10 +46,19 @@ export class FunctionalLayoutImpl extends FunctionalLayout {
 		}
 
 		for (const modeName of Object.keys(data.modes)) {
-			lookupState(modeName);
+			const s = lookupState(modeName);
+			for (const modifierCombination of s.modifiers) {
+				for (const mod of modifierCombination) {
+					modifierKeys.add(mod);
+				}
+			}
 		}
 
 		function getState(keys: Set<PhysicalKey>): FunctionalLayoutStateImpl | undefined {
+			if ([...keys.values()].some(k => !modifierKeys.has(k))) {
+				return undefined;
+			}
+
 			let best = undefined;
 			let length = -1;
 			for (const m of modes.values()) {
