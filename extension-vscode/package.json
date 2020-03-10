@@ -4,11 +4,12 @@
 	"displayName": "Key Bindings Viewer",
 	"description": "Displays a keyboard with applicable keybindings on the keys.",
 	"icon": "docs/logo.png",
-	"version": "0.1.0",
+	"version": "0.1.2",
 	"license": "MIT",
 	"engines": {
 		"vscode": "^1.35.0"
 	},
+	"preview": true,
 	"publisher": "hediet",
 	"author": {
 		"email": "henning.dieterichs@live.de",

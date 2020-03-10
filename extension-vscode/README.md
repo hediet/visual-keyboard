@@ -27,6 +27,8 @@ Install this extension and execute the command `Open Keyboard View`.
     Uses a secured and local websocket connection to send those to the webview (but only if the VS Code window has focus).
     Please review the code if you have security concerns.
     No data leaves your computer.
+-   Linux key detection needs to be tuned. Modifiers work though.
+-   Tested on windows & linux (not tested on Mac).
 
 ## Settings
 
