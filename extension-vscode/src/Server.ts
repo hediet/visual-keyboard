@@ -17,7 +17,7 @@ export class Server {
 	public readonly dispose = Disposable.fn();
 
 	public get secret(): string {
-		return this.wsServer.secret;
+		return this.wsServer.serverSecret;
 	}
 
 	public get wsPort(): number {

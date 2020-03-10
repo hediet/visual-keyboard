@@ -63,7 +63,12 @@ export class GUI extends React.Component<{ model: Model }, {}> {
 
 							<Tags model={model} />
 							<div className="part-Header-Item" style={{ marginLeft: "auto" }}>
-								<Button intent={"primary"}>Get The VS Code Extension</Button>
+								<AnchorButton
+									intent={"primary"}
+									href="https://marketplace.visualstudio.com/items?itemName=hediet.key-bindings-viewer"
+								>
+									Get The VS Code Extension
+								</AnchorButton>
 							</div>
 
 							<div className="part-Header-Item">

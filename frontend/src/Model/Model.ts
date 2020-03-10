@@ -113,7 +113,7 @@ export class Model {
 		return new Modifiers(hasShift, hasAlt, hasCtrl, hasMeta);
 	}
 
-	private isKeyBindingsModifier(m: VirtualKey): boolean {
+	public isKeyBindingsModifier(m: VirtualKey): boolean {
 		const s = new Set([
 			KnownVirtualKeys.CtrlL,
 			KnownVirtualKeys.CtrlR,

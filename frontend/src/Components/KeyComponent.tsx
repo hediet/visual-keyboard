@@ -3,6 +3,7 @@ import React = require("react");
 import { Model, Keyboard, PhysicalKeyDef } from "../Model";
 import classNames = require("classnames");
 import { AutoResize, Stretch } from "./AutoResize";
+import { autorun, observable, computed } from "mobx";
 
 @observer
 export class KeyComponent extends React.Component<{
@@ -10,6 +11,45 @@ export class KeyComponent extends React.Component<{
 	keyboard: Keyboard;
 	keyDef: PhysicalKeyDef;
 }> {
+	//@observable private isPressedDelayed = false;
+
+	@computed get isPressed() {
+		return this.props.keyboard.isKeyPressed(this.props.keyDef.physicalKey);
+	}
+
+	/*
+	TODO find a better way to implement `isPressedDelayed`!
+
+	constructor(props: KeyComponent["props"]) {
+		super(props);
+
+		let pressed = new Date();
+		autorun(() => {
+			if (this.isPressed) {
+				this.isPressedDelayed = true;
+				pressed = new Date();
+			} else {
+				let requiredWaitingTime = 700 - (new Date().getTime() - pressed.getTime());
+
+				const keyFn = this.props.keyboard.currentFunctionalLayoutState.getFunction(
+					this.props.keyDef.physicalKey
+				);
+				if (
+					keyFn &&
+					keyFn.virtualKey &&
+					this.props.model.isKeyBindingsModifier(keyFn.virtualKey)
+				) {
+					// modifiers don't need delays
+					requiredWaitingTime = 0;
+				}
+
+				setTimeout(() => {
+					this.isPressedDelayed = false;
+				}, Math.max(0, requiredWaitingTime));
+			}
+		});
+	}*/
+
 	render() {
 		const { keyDef, keyboard, model } = this.props;
 
@@ -46,7 +86,7 @@ export class KeyComponent extends React.Component<{
 			<button
 				className={classNames(
 					"component-Key",
-					keyboard.isKeyPressed(keyDef.physicalKey) && "pressed",
+					this.isPressed && "pressed",
 					// model.activeKey === keyDef.physicalKey && "active",
 					virtualKey && `virtualKey-${virtualKey}`
 				)}

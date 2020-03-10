@@ -29,7 +29,7 @@
 			],
 			"env": {
 				"HOT_RELOAD": "",
-				"USE_DEV_UI": "true"
+				"USE_DEV_UI": ""
 			},
 			"outFiles": ["${workspaceFolder}/extension-vscode/dist/**/*.js"]
 		}

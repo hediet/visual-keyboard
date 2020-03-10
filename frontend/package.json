@@ -9,7 +9,7 @@
 	"main": "./index",
 	"types": "./index.d.ts",
 	"dependencies": {
-		"@blueprintjs/core": "^3.17.1",
+		"@blueprintjs/core": "^3.24.0",
 		"@blueprintjs/select": "^3.10.0",
 		"@hediet/std": "^0.6.0",
 		"@types/node": "^13.7.0",
