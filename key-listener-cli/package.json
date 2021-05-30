@@ -16,7 +16,7 @@
 		"iohook": "^0.6.5",
 		"@hediet/typed-json-rpc": "^0.7.7",
 		"@hediet/typed-json-rpc-websocket-server": "^0.7.7",
-		"ws": "^7.2.1",
+		"ws": "^7.4.6",
 		"rxjs": "^6.5.4",
 		"crypto-random-string": "^3.1.0"
 	},
